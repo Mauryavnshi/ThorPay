@@ -280,5 +280,54 @@ header{
 .wallet-btn::before{
     content:"👛 ";
 }
+.community{
+    text-align:center;
+    margin:60px auto;
+}
 
+.community h2{
+    color:#fff;
+    margin-bottom:20px;
+}
+
+.coming-links{
+    display:flex;
+    justify-content:center;
+    gap:20px;
+    flex-wrap:wrap;
+    margin-bottom:20px;
+}
+
+.coming-links span{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    padding:12px 20px;
+    border:1px solid #39ff88;
+    border-radius:12px;
+    background:#111827;
+    color:#39ff88;
+    font-weight:600;
+    transition:0.3s;
+    box-shadow:0 0 12px rgba(57,255,136,.25);
+}
+
+.coming-links span:hover{
+    background:#39ff88;
+    color:#081220;
+    transform:translateY(-3px);
+    box-shadow:0 0 20px rgba(57,255,136,.6);
+}
+
+.community-note{
+    color:#9ca3af;
+    font-size:15px;
+    line-height:1.7;
+    max-width:650px;
+    margin:0 auto;
+}
+
+.coming-links i{
+    font-size:20px;
+}
 

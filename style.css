@@ -111,3 +111,25 @@ footer{
     padding:30px;
     color:#94a3b8;
 }
+.demo{
+  width:350px;
+  margin:40px auto;
+  display:flex;
+  flex-direction:column;
+  gap:15px;
+}
+
+.demo input{
+  padding:12px;
+  border-radius:8px;
+  border:none;
+}
+
+.demo button{
+  padding:12px;
+  background:#3cff6d;
+  border:none;
+  border-radius:8px;
+  cursor:pointer;
+  font-weight:bold;
+}

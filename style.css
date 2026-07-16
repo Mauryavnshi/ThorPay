@@ -35,7 +35,7 @@ nav button{
 
 .hero{
     text-align:center;
-    padding:100px 20px;
+    padding:140px 20px 80px;
 }
 
 .hero h1{
@@ -57,16 +57,18 @@ nav button{
 }
 
 .card{
-    width:250px;
+    width:280px;
     background:#1e293b;
     padding:25px;
     border-radius:15px;
     text-align:center;
     transition:.3s;
+    box-shadow:0 0 20px rgba(57,255,136,.15);
 }
 
 .card:hover{
-    transform:translateY(-8px);
+    transform: translateY(-8px) scale(1.03);
+    box-shadow: 0 0 30px rgba(57,255,136,.35);
 }
 
 .card h3{
@@ -80,6 +82,9 @@ nav button{
     background:#1e293b;
     padding:30px;
     border-radius:15px;
+    border:1px solid rgba(57,255,136,.2);
+box-shadow:0 0 30px rgba(57,255,136,.15);
+ backdrop-filter: blur(12px);   
 }
 
 .payment h2{
@@ -93,8 +98,16 @@ nav button{
     margin:10px 0;
     border:none;
     border-radius:8px;
+    background:#0f172a;
+color:white;
+border:1px solid rgba(57,255,136,.25);
+transition:0.3s;
 }
-
+.payment input:focus{
+    outline:none;
+    border-color:#39ff88;
+    box-shadow:0 0 15px rgba(57,255,136,.4);
+}
 .payment button{
     width:100%;
     padding:12px;
@@ -227,7 +240,7 @@ footer{
 .roadmap{
     width:380px;
     margin:40px auto;
-    text-align:left;
+    text-align:center;
 }
 
 .roadmap h2{
@@ -282,7 +295,7 @@ header{
 }
 .community{
     text-align:center;
-    margin:60px auto;
+    margin:90px auto 60px;
 }
 
 .community h2{
@@ -330,4 +343,22 @@ header{
 .coming-links i{
     font-size:20px;
 }
+.community{
+    text-align:center;
+    margin:60px auto;
+}
 
+.community-links{
+    display:flex;
+    justify-content:center;
+    gap:25px;
+    margin:20px 0;
+    font-size:22px;
+}
+
+.community-note{
+    color:#9ca3af;
+    max-width:700px;
+    margin:auto;
+    line-height:1.6;
+}

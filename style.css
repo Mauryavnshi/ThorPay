@@ -168,3 +168,82 @@ footer{
     padding:30px;
     color:#94a3b8;
 }
+.network{
+    text-align:center;
+    color:#39ff88;
+    font-weight:bold;
+    margin:20px 0;
+}
+
+.token{
+    text-align:center;
+    margin-bottom:20px;
+}
+
+.token h3{
+    color:white;
+    margin-bottom:8px;
+}
+
+.token p{
+    color:#ffd54a;
+    font-weight:bold;
+}
+
+.faucet{
+    width:380px;
+    margin:40px auto;
+    padding:20px;
+    background:#1d2433;
+    border-radius:12px;
+    text-align:center;
+}
+
+.faucet h2{
+    color:white;
+    margin-bottom:10px;
+}
+
+.faucet p{
+    color:#bdbdbd;
+    margin-bottom:15px;
+}
+
+.faucet button{
+    width:100%;
+    padding:12px;
+    background:#39ff88;
+    color:black;
+    border:none;
+    border-radius:8px;
+    font-weight:bold;
+    cursor:pointer;
+}
+
+.faucet button:hover{
+    opacity:0.9;
+}
+
+.roadmap{
+    width:380px;
+    margin:40px auto;
+    text-align:left;
+}
+
+.roadmap h2{
+    text-align:center;
+    color:white;
+    margin-bottom:15px;
+}
+
+.roadmap p{
+    color:white;
+    margin:8px 0;
+}
+
+#status{
+    text-align:center;
+    color:#39ff88;
+    font-weight:bold;
+    margin-top:12px;
+}

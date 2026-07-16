@@ -133,3 +133,38 @@ footer{
   cursor:pointer;
   font-weight:bold;
 }
+.network{
+    text-align:center;
+    color:#3cff6d;
+    font-weight:bold;
+    margin:20px 0;
+}
+
+.token{
+    text-align:center;
+    color:white;
+    margin:20px 0;
+}
+
+.roadmap{
+    text-align:center;
+    margin:50px auto;
+    color:white;
+}
+
+.roadmap p{
+    margin:10px 0;
+}
+
+#status{
+    color:#3cff6d;
+    text-align:center;
+    margin-top:10px;
+    font-weight:bold;
+}
+
+footer{
+    text-align:center;
+    padding:30px;
+    color:#94a3b8;
+}

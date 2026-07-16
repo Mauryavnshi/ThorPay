@@ -247,3 +247,38 @@ footer{
     font-weight:bold;
     margin-top:12px;
 }
+header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    padding:20px 40px;
+}
+
+.wallet-btn{
+    background:linear-gradient(135deg,#39ff88,#00c853);
+    color:#fff;
+    border:none;
+    border-radius:12px;
+    padding:12px 26px;
+    font-size:16px;
+    font-weight:700;
+    cursor:pointer;
+    transition:all .3s ease;
+    box-shadow:0 0 15px rgba(57,255,136,.4);
+}
+
+.wallet-btn:hover{
+    transform:translateY(-2px);
+    background:linear-gradient(135deg,#4cff99,#00e676);
+    box-shadow:0 0 25px rgba(57,255,136,.7);
+}
+
+.wallet-btn:active{
+    transform:scale(0.97);
+}
+
+.wallet-btn::before{
+    content:"👛 ";
+}
+
+

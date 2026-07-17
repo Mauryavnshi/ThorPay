@@ -682,7 +682,75 @@ a,
 
 }
 
+/* ======================
+TOAST
+====================== */
 
+.toast{
+
+position:fixed;
+
+bottom:30px;
+
+right:30px;
+
+background:#2563EB;
+
+color:#fff;
+
+padding:14px 22px;
+
+border-radius:12px;
+
+opacity:0;
+
+transform:translateY(20px);
+
+transition:.3s;
+
+z-index:9999;
+
+}
+
+.toast.show{
+
+opacity:1;
+
+transform:translateY(0);
+
+}
+
+
+/* ======================
+ACTIVE NAV
+====================== */
+
+nav a.active{
+
+color:#4F8CFF;
+
+}
+
+
+/* ======================
+SCROLL ANIMATION
+====================== */
+
+.card{
+
+opacity:0;
+
+transform:translateY(30px);
+
+}
+
+.card.visible{
+
+opacity:1;
+
+transform:translateY(0);
+
+}
 
 /* ======================
 END OF FILE

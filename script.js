@@ -65,6 +65,7 @@ connectButton.addEventListener("click", () => {
         sendBtn.disabled = true;
 
     }
+    }); 
   // =========================
 // THORPAY V2 - PART 2
 // Demo Payment Logic
@@ -109,7 +110,7 @@ sendBtn.addEventListener("click", () => {
         status.innerHTML = "🟢 Payment Successful";
         previewStatus.innerHTML = "Transaction Confirmed";
 
-        recentList.innerHTML =
+        recentList.innerHTML +=
             `<li>✅ ${amount} USDC → ${address.slice(0,8)}...<br><small>${txHash}</small></li>`;
 
         showToast("Payment Sent Successfully!", "success");
@@ -221,5 +222,4 @@ window.addEventListener("load", () => {
 
     console.log("⚡ ThorPay V2 Loaded Successfully");
 
-});
 });

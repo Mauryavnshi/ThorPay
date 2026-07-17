@@ -1,323 +1,225 @@
-
-// Elements
+// =========================
+// THORPAY V2 - PART 1
+// Wallet Connection
+// =========================
 
 const connectButton = document.getElementById("connectWallet");
-const heroBtn = document.getElementById("heroConnect");
 const sendBtn = document.getElementById("sendBtn");
+
+const status = document.getElementById("status");
+const previewStatus = document.getElementById("previewStatus");
 
 const walletInput = document.getElementById("walletAddress");
 const amountInput = document.getElementById("amount");
 
-const status = document.getElementById("status");
-
-// ----------------------
-// Wallet State
-// ----------------------
-
 let walletConnected = false;
-let demoBalance = 1000;
+let walletAddress = "";
 
-// ----------------------
-// Toast Notification
-// ----------------------
+// Disable payment until wallet connects
+sendBtn.disabled = true;
 
-function showToast(message,color="#16a34a"){
+connectButton.addEventListener("click", () => {
 
-const toast=document.createElement("div");
+    if (!walletConnected) {
 
-toast.innerHTML=message;
+        walletConnected = true;
 
-toast.style.position="fixed";
-toast.style.bottom="25px";
-toast.style.right="25px";
-toast.style.background=color;
-toast.style.color="#fff";
-toast.style.padding="14px 22px";
-toast.style.borderRadius="12px";
-toast.style.boxShadow="0 0 25px rgba(57,255,136,.4)";
-toast.style.fontWeight="bold";
-toast.style.zIndex="99999";
+        walletAddress =
+            "0x" +
+            Math.random()
+                .toString(16)
+                .substring(2, 10)
+                .toUpperCase();
 
-document.body.appendChild(toast);
+        connectButton.innerHTML = "🟢 Wallet Connected";
 
-setTimeout(()=>{
+        status.innerHTML = "🟢 Wallet Connected";
 
-toast.remove();
+        previewStatus.innerHTML = "Ready to Send";
 
-},3000);
+        walletInput.value = walletAddress;
 
-}
+        walletInput.readOnly = true;
 
-// ----------------------
-// Balance
-// ----------------------
+        sendBtn.disabled = false;
 
-const balanceCard=document.createElement("p");
+    } else {
 
-balanceCard.style.marginTop="18px";
-balanceCard.style.color="#39ff88";
-balanceCard.style.fontWeight="700";
+        walletConnected = false;
 
-balanceCard.innerHTML=
-"💰 Demo Balance : "+demoBalance+" USDC";
+        walletAddress = "";
 
-document.querySelector(".payment").appendChild(balanceCard);
+        connectButton.innerHTML = "🟠 Connect Wallet";
 
-function updateBalance(amount){
+        status.innerHTML = "🔴 Wallet Not Connected";
 
-demoBalance-=Number(amount);
+        previewStatus.innerHTML =
+            "Waiting for Wallet Connection";
 
-if(demoBalance<0){
+        walletInput.value = "";
 
-demoBalance=0;
+        walletInput.readOnly = false;
 
-}
+        amountInput.value = "";
 
-balanceCard.innerHTML=
-"💰 Demo Balance : "+demoBalance+" USDC";
+        sendBtn.disabled = true;
 
-}
+    }
+  // =========================
+// THORPAY V2 - PART 2
+// Demo Payment Logic
+// =========================
 
-// ----------------------
-// Connect Wallet
-// ----------------------
+const recentList = document.querySelector(".recent-card ul");
 
-function connectWallet(){
+sendBtn.addEventListener("click", () => {
 
-if(walletConnected){
+    if (!walletConnected) {
 
-showToast("Wallet Already Connected");
+        showToast("Connect your wallet first!", "error");
+        return;
 
-return;
+    }
 
-}
+    const address = walletInput.value.trim();
+    const amount = amountInput.value.trim();
 
-walletConnected=true;
+    if (address === "" || amount === "") {
 
-connectButton.innerHTML="🟢 Wallet Connected";
+        showToast("Please fill all fields.", "error");
+        return;
 
-connectButton.style.background="#16a34a";
+    }
 
-status.innerHTML="🟢 Wallet Connected";
+    sendBtn.disabled = true;
+    sendBtn.innerHTML = "⏳ Processing...";
 
-showToast("Wallet Connected Successfully");
+    status.innerHTML = "🟡 Processing Payment...";
+    previewStatus.innerHTML = "Transaction Pending";
 
-}
+    setTimeout(() => {
 
-connectButton.addEventListener("click",connectWallet);
+        const txHash =
+            "0x" +
+            Math.random()
+                .toString(16)
+                .substring(2, 14)
+                .toUpperCase();
 
-// Hero Button
+        status.innerHTML = "🟢 Payment Successful";
+        previewStatus.innerHTML = "Transaction Confirmed";
 
-if(heroBtn){
+        recentList.innerHTML =
+            `<li>✅ ${amount} USDC → ${address.slice(0,8)}...<br><small>${txHash}</small></li>`;
 
-heroBtn.addEventListener("click",connectWallet);
+        showToast("Payment Sent Successfully!", "success");
 
-}
+        sendBtn.innerHTML = "💸 Send Payment";
+        sendBtn.disabled = false;
 
-// Transaction History
+        amountInput.value = "";
 
-const history=document.createElement("div");
-
-history.style.marginTop="30px";
-
-history.innerHTML="<h3>📜 Recent Transactions</h3>";
-
-document.querySelector(".payment").appendChild(history);
-
-// Payment
-
-sendBtn.addEventListener("click",()=>{
-
-if(!walletConnected){
-
-showToast("⚠ Connect Wallet First","#dc2626");
-
-return;
-
-}
-
-const wallet=walletInput.value.trim();
-
-const amount=amountInput.value.trim();
-
-if(wallet===""||amount===""){
-
-showToast("⚠ Fill all fields","#dc2626");
-
-status.innerHTML="❌ Missing Information";
-
-return;
-
-}
-
-status.innerHTML="⏳ Processing Payment...";
-
-sendBtn.disabled=true;
-
-sendBtn.innerHTML="Processing...";
-
-setTimeout(()=>{
-
-const txHash=
-"0x"+
-Math.random().toString(16).substring(2,18)+
-Math.random().toString(16).substring(2,18);
-
-updateBalance(amount);
-
-status.innerHTML=
-"✅ Payment Successful<br><small>"+txHash+"</small>";
-
-showToast("🎉 Payment Successful");
-
-const item=document.createElement("p");
-
-item.style.marginTop="10px";
-
-item.innerHTML=
-"💸 "+
-amount+
-" USDC → "+
-wallet.substring(0,8)+
-"...<br><small>"+txHash+"</small>";
-
-history.appendChild(item);
-
-alert(
-"Demo Transaction\n\n"+
-"Wallet : "+wallet+
-"\nAmount : "+amount+
-" USDC\n\n"+
-"TX Hash:\n"+txHash
-);
-
-walletInput.value="";
-
-amountInput.value="";
-
-walletInput.focus();
-
-sendBtn.disabled=false;
-
-sendBtn.innerHTML="🚀 Send Payment";
-
-},2000);
+    }, 2500);
 
 });
+// =========================
+// THORPAY V2 - PART 3
+// Toast + Helpers
+// =========================
 
-// Auto Focus
+function showToast(message, type = "success") {
 
-walletInput.focus();
+    let toast = document.getElementById("toast");
 
-// Copy Wallet Address
+    if (!toast) {
 
-walletInput.addEventListener("dblclick",()=>{
+        toast = document.createElement("div");
 
-if(walletInput.value==="") return;
+        toast.id = "toast";
 
-navigator.clipboard.writeText(walletInput.value);
+        toast.style.position = "fixed";
+        toast.style.bottom = "30px";
+        toast.style.right = "30px";
+        toast.style.padding = "14px 22px";
+        toast.style.borderRadius = "12px";
+        toast.style.fontWeight = "600";
+        toast.style.zIndex = "9999";
+        toast.style.transition = "0.3s ease";
+        toast.style.opacity = "0";
 
-showToast("📋 Wallet Address Copied");
+        document.body.appendChild(toast);
 
-});
+    }
 
-// Enter Key Support
+    toast.innerHTML = message;
 
-amountInput.addEventListener("keypress",(e)=>{
+    if (type === "success") {
 
-if(e.key==="Enter"){
+        toast.style.background = "#16a34a";
+        toast.style.color = "#ffffff";
 
-sendBtn.click();
+    } else {
+
+        toast.style.background = "#dc2626";
+        toast.style.color = "#ffffff";
+
+    }
+
+    toast.style.opacity = "1";
+
+    setTimeout(() => {
+
+        toast.style.opacity = "0";
+
+    }, 3000);
 
 }
 
-});
-
-// Wallet Address Validation
-
-walletInput.addEventListener("input",()=>{
-
-if(walletInput.value.length>0 &&
-walletInput.value.length<10){
-
-status.innerHTML="⚠ Wallet Address seems too short";
-
-status.style.color="#facc15";
-
-}else{
-
-status.style.color="#39ff88";
-
-}
-
-});
-
-// Network Badge
-
-const network=document.createElement("div");
-
-network.innerHTML="🟢 Connected Network : Arc Testnet";
-
-network.style.marginTop="20px";
-
-network.style.color="#39ff88";
-
-network.style.fontWeight="700";
-
-document.querySelector(".payment").appendChild(network);
-
-// Demo Version
-
-const version=document.createElement("p");
-
-version.innerHTML="ThorPay Demo v1.0";
-
-version.style.marginTop="10px";
-
-version.style.fontSize="14px";
-
-version.style.color="#94a3b8";
-
-document.querySelector(".payment").appendChild(version);
-
-// Welcome
-
-window.addEventListener("load",()=>{
-
-setTimeout(()=>{
-
-showToast("⚡ Welcome to ThorPay");
-
-},800);
-
-});
-
+// =========================
 // Footer Year
+// =========================
 
-const footer=document.querySelector("footer");
+const year = document.getElementById("year");
 
-if(footer){
+if (year) {
 
-const year=document.createElement("p");
-
-year.innerHTML="© "+new Date().getFullYear()+" ThorPay Demo";
-
-year.style.marginTop="12px";
-
-year.style.color="#94a3b8";
-
-footer.appendChild(year);
+    year.textContent = new Date().getFullYear();
 
 }
 
-// Console Message
+// =========================
+// Smooth Scroll
+// =========================
 
-console.log(
-"%c⚡ ThorPay Loaded Successfully",
-"color:#39ff88;font-size:18px;font-weight:bold;"
-);
+document.querySelectorAll('a[href^="#"]').forEach(link => {
 
-console.log(
-"%cPowered by Arc Network",
-"color:#ffffff;font-size:14px;"
-);
+    link.addEventListener("click", function (e) {
+
+        e.preventDefault();
+
+        const target = document.querySelector(this.getAttribute("href"));
+
+        if (target) {
+
+            target.scrollIntoView({
+
+                behavior: "smooth"
+
+            });
+
+        }
+
+    });
+
+});
+
+// =========================
+// Page Loaded
+// =========================
+
+window.addEventListener("load", () => {
+
+    console.log("⚡ ThorPay V2 Loaded Successfully");
+
+});
+});

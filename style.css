@@ -1,530 +1,604 @@
-/* =========================================
-   THORPAY V2
+/* ==========================
+   THORPAY V3
    PART 1
-   Reset + Body + Header + Hero
-========================================= */
+========================== */
 
 *{
     margin:0;
     padding:0;
     box-sizing:border-box;
-}
-
-html{
     scroll-behavior:smooth;
 }
 
 body{
-    font-family:Inter,Segoe UI,Arial,sans-serif;
-    background:#0b1220;
-    color:#ffffff;
+
+    font-family:'Poppins',sans-serif;
+
+    background:#0B0F19;
+
+    color:#F8FAFC;
+
     line-height:1.6;
-    overflow-x:hidden;
+
 }
 
-/* Scrollbar */
+a{
 
-::-webkit-scrollbar{
-    width:10px;
+    text-decoration:none;
+
+    color:white;
+
 }
 
-::-webkit-scrollbar-track{
-    background:#111827;
+section{
+
+    padding:90px 8%;
+
 }
 
-::-webkit-scrollbar-thumb{
-    background:#f59e0b;
-    border-radius:20px;
+h1,h2,h3{
+
+    font-weight:700;
+
 }
 
-/* Header */
+p{
 
-.header{
-    width:100%;
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:22px 8%;
-    background:rgba(17,24,39,.9);
-    backdrop-filter:blur(12px);
-    position:sticky;
+    color:#B8C1D9;
+
+}
+
+
+/* ======================
+NAVBAR
+====================== */
+
+header{
+
+    position:fixed;
+
     top:0;
-    z-index:1000;
+
+    width:100%;
+
+    display:flex;
+
+    justify-content:space-between;
+
+    align-items:center;
+
+    padding:20px 8%;
+
+    background:rgba(11,15,25,.80);
+
+    backdrop-filter:blur(18px);
+
     border-bottom:1px solid rgba(255,255,255,.08);
+
+    z-index:999;
+
 }
 
-.logo h1{
-    font-size:2rem;
-    color:#f59e0b;
+.logo{
+
+    font-size:28px;
+
     font-weight:700;
+
+    color:#4F8CFF;
+
 }
 
-.logo p{
-    color:#9ca3af;
-    font-size:.9rem;
-    margin-top:4px;
+nav{
+
+    display:flex;
+
+    gap:30px;
+
 }
 
-.wallet-btn{
-    background:#f59e0b;
-    color:#111827;
-    border:none;
-    padding:12px 26px;
-    border-radius:12px;
-    font-size:15px;
-    font-weight:700;
-    cursor:pointer;
+nav a{
+
+    color:#DCE7FF;
+
     transition:.3s;
+
+    font-weight:500;
+
 }
 
-.wallet-btn:hover{
+nav a:hover{
+
+    color:#4F8CFF;
+
+}
+
+#walletBtn{
+
+    padding:12px 22px;
+
+    border:none;
+
+    border-radius:12px;
+
+    background:#2563EB;
+
+    color:white;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+    font-weight:600;
+
+}
+
+#walletBtn:hover{
+
+    background:#3B82F6;
+
     transform:translateY(-2px);
-    background:#fbbf24;
-    box-shadow:0 12px 25px rgba(245,158,11,.35);
+
 }
 
-/* Hero */
+
+/* ======================
+HERO
+====================== */
 
 .hero{
-    padding:90px 8%;
+
+    min-height:100vh;
+
     display:flex;
+
     justify-content:center;
+
     align-items:center;
+
     text-align:center;
+
+    background:
+    radial-gradient(circle at top,#1D4ED8 0%,transparent 35%),
+    #0B0F19;
+
 }
 
 .hero-content{
-    max-width:820px;
+
+    max-width:760px;
+
 }
 
-.hero-badge{
-    display:inline-block;
-    padding:8px 18px;
-    border-radius:999px;
-    background:rgba(245,158,11,.12);
-    color:#fbbf24;
-    border:1px solid rgba(245,158,11,.35);
-    margin-bottom:22px;
-    font-size:14px;
-    font-weight:600;
-}
+.hero h1{
 
-.hero h2{
-    font-size:3rem;
+    font-size:64px;
+
     line-height:1.2;
-    margin-bottom:20px;
+
+    margin-bottom:25px;
+
 }
 
 .hero p{
-    color:#cbd5e1;
-    font-size:1.05rem;
-    margin-bottom:35px;
+
+    font-size:20px;
+
+    margin-bottom:40px;
+
 }
 
 .hero-buttons{
+
     display:flex;
+
     justify-content:center;
+
     gap:18px;
+
     flex-wrap:wrap;
+
+}
+
+.primary-btn{
+
+    padding:15px 32px;
+
+    border:none;
+
+    border-radius:14px;
+
+    background:#2563EB;
+
+    color:white;
+
+    font-size:16px;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+.primary-btn:hover{
+
+    background:#3B82F6;
+
+    transform:translateY(-3px);
+
+}
+
+.secondary-btn{
+
+    padding:15px 32px;
+
+    border:1px solid #2563EB;
+
+    background:transparent;
+
+    color:white;
+
+    border-radius:14px;
+
+    cursor:pointer;
+
+    transition:.3s;
+
+}
+
+.secondary-btn:hover{
+
+    background:#2563EB;
+
+}
+/* ======================
+FEATURES
+====================== */
+
+.features{
+
+    background:#101827;
+
+}
+
+.features h2{
+
+    text-align:center;
+
+    font-size:42px;
+
+    margin-bottom:60px;
+
+}
+
+.grid{
+
+    display:grid;
+
+    grid-template-columns:repeat(auto-fit,minmax(260px,1fr));
+
+    gap:30px;
+
+}
+
+.card{
+
+    background:rgba(255,255,255,.05);
+
+    border:1px solid rgba(255,255,255,.08);
+
+    border-radius:20px;
+
+    padding:35px;
+
+    transition:.35s;
+
+    backdrop-filter:blur(14px);
+
+}
+
+.card:hover{
+
+    transform:translateY(-10px);
+
+    border-color:#2563EB;
+
+    box-shadow:0 0 30px rgba(37,99,235,.25);
+
+}
+
+.card h3{
+
+    margin-bottom:18px;
+
+    font-size:24px;
+
+}
+
+.card p{
+
+    font-size:15px;
+
+    color:#C9D4E8;
+
+}
+
+
+/* ======================
+MERCHANT
+====================== */
+
+.merchant{
+
+    background:#0B0F19;
+
+}
+
+.merchant h2{
+
+    text-align:center;
+
+    font-size:42px;
+
+    margin-bottom:60px;
+
+}
+
+
+/* ======================
+ROADMAP
+====================== */
+
+.roadmap{
+
+    background:#101827;
+
+}
+
+.roadmap h2{
+
+    text-align:center;
+
+    font-size:42px;
+
+    margin-bottom:40px;
+
+}
+
+.roadmap ul{
+
+    max-width:700px;
+
+    margin:auto;
+
+    list-style:none;
+
+}
+
+.roadmap li{
+
+    background:rgba(255,255,255,.05);
+
+    margin-bottom:18px;
+
+    padding:18px 22px;
+
+    border-radius:14px;
+
+    border-left:4px solid #2563EB;
+
+    transition:.3s;
+
+}
+
+.roadmap li:hover{
+
+    transform:translateX(8px);
+
+    background:rgba(255,255,255,.08);
+
+}
+
+
+/* ======================
+FOOTER
+====================== */
+
+footer{
+
+    padding:50px 8%;
+
+    text-align:center;
+
+    border-top:1px solid rgba(255,255,255,.08);
+
+    background:#0B0F19;
+
+}
+
+footer h3{
+
+    font-size:28px;
+
+    margin-bottom:15px;
+
+    color:#4F8CFF;
+
+}
+
+footer p{
+
+    margin-top:8px;
+
+    color:#94A3B8;
+
+}
+/* ======================
+RESPONSIVE
+====================== */
+
+@media (max-width:992px){
+
+header{
+
+    padding:18px 6%;
+
+}
+
+nav{
+
+    gap:18px;
+
+}
+
+.hero h1{
+
+    font-size:52px;
+
+}
+
+.hero p{
+
+    font-size:18px;
+
+}
+
+.features h2,
+.merchant h2,
+.roadmap h2{
+
+    font-size:36px;
+
+}
+
+}
+
+
+
+@media (max-width:768px){
+
+header{
+
+    flex-direction:column;
+
+    gap:18px;
+
+}
+
+nav{
+
+    flex-wrap:wrap;
+
+    justify-content:center;
+
+}
+
+.hero{
+
+    padding-top:120px;
+
+}
+
+.hero h1{
+
+    font-size:42px;
+
+}
+
+.hero p{
+
+    font-size:17px;
+
+}
+
+.hero-buttons{
+
+    flex-direction:column;
+
+    align-items:center;
+
 }
 
 .primary-btn,
 .secondary-btn{
-    padding:14px 28px;
-    border-radius:12px;
-    text-decoration:none;
-    font-weight:700;
-    transition:.3s;
+
+    width:220px;
+
 }
 
-.primary-btn{
-    border:none;
-    background:#f59e0b;
-    color:#111827;
-    cursor:pointer;
+.grid{
+
+    grid-template-columns:1fr;
+
 }
 
-.primary-btn:hover{
-    background:#fbbf24;
-    transform:translateY(-2px);
+section{
+
+    padding:70px 6%;
+
 }
 
-.secondary-btn{
-    border:2px solid #f59e0b;
-    color:#f59e0b;
 }
 
-.secondary-btn:hover{
-    background:#f59e0b;
-    color:#111827;
-}
-/* =========================================
-   THORPAY V2
-   PART 2
-   Demo Payment + Preview
-========================================= */
 
-.demo{
-    padding:70px 8%;
-    display:flex;
-    justify-content:center;
+
+@media (max-width:480px){
+
+.logo{
+
+    font-size:24px;
+
 }
 
-.demo-card{
-    width:100%;
-    max-width:700px;
-    background:#111827;
-    border:1px solid rgba(255,255,255,.08);
-    border-radius:20px;
-    padding:35px;
-    box-shadow:0 20px 45px rgba(0,0,0,.35);
+.hero h1{
+
+    font-size:34px;
+
 }
 
-.demo-card h2{
-    text-align:center;
-    margin-bottom:12px;
-    color:#f59e0b;
-}
+.hero p{
 
-.demo-subtitle{
-    text-align:center;
-    color:#9ca3af;
-    margin-bottom:25px;
-}
-
-.network-badge{
-    display:inline-block;
-    padding:8px 18px;
-    background:rgba(245,158,11,.15);
-    color:#fbbf24;
-    border-radius:999px;
-    margin-bottom:20px;
-    font-size:14px;
-    font-weight:600;
-}
-
-.token-box{
-    background:#1f2937;
-    border-radius:14px;
-    padding:18px;
-    margin-bottom:22px;
-}
-
-.token-box h3{
-    color:#f59e0b;
-    margin-bottom:8px;
-}
-
-.demo-card input{
-    width:100%;
-    padding:15px;
-    margin-bottom:18px;
-    border:none;
-    outline:none;
-    border-radius:12px;
-    background:#0f172a;
-    color:#fff;
-    font-size:15px;
-    border:1px solid rgba(255,255,255,.08);
-}
-
-.demo-card input:focus{
-    border-color:#f59e0b;
-    box-shadow:0 0 0 3px rgba(245,158,11,.2);
-}
-
-.send-btn{
-    width:100%;
-    padding:15px;
-    border:none;
-    border-radius:12px;
-    background:#f59e0b;
-    color:#111827;
     font-size:16px;
-    font-weight:700;
-    cursor:pointer;
-    transition:.3s;
+
 }
 
-.send-btn:hover{
-    background:#fbbf24;
-    transform:translateY(-2px);
+.features h2,
+.merchant h2,
+.roadmap h2{
+
+    font-size:30px;
+
 }
 
-.send-btn:disabled{
-    background:#4b5563;
-    color:#d1d5db;
-    cursor:not-allowed;
-    transform:none;
-}
+#walletBtn{
 
-.status{
-    margin-top:18px;
-    text-align:center;
-    font-weight:600;
-}
-
-.balance-card,
-.recent-card{
-    margin-top:25px;
-    background:#1f2937;
-    padding:20px;
-    border-radius:14px;
-}
-
-.balance-card h3,
-.recent-card h3{
-    color:#f59e0b;
-    margin-bottom:10px;
-}
-
-.recent-card ul{
-    list-style:none;
-}
-
-.recent-card li{
-    padding:12px 0;
-    border-bottom:1px solid rgba(255,255,255,.06);
-    word-break:break-word;
-}
-
-.transaction-preview{
-    padding:60px 8%;
-    display:flex;
-    justify-content:center;
-}
-
-.preview-card{
     width:100%;
-    max-width:700px;
-    background:#111827;
-    border-radius:20px;
-    padding:30px;
-    border:1px solid rgba(255,255,255,.08);
+
 }
 
-.preview-card h2{
-    color:#f59e0b;
-    text-align:center;
-    margin-bottom:25px;
+.card{
+
+    padding:28px;
+
 }
 
-.preview-item{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    padding:15px 0;
-    border-bottom:1px solid rgba(255,255,255,.08);
 }
 
-.preview-item:last-child{
-    border-bottom:none;
+
+
+/* ======================
+ANIMATIONS
+====================== */
+
+.hero-content{
+
+    animation:fadeUp .8s ease;
+
 }
 
-.preview-item span{
-    color:#9ca3af;
-}
+.card{
 
-.preview-item strong{
-    color:#fff;
-}
-/* =========================================
-   THORPAY V2
-   PART 3
-   Faucet + Roadmap + Community + Footer
-========================================= */
-
-/* Faucet */
-
-.faucet{
-    padding:70px 8%;
-    display:flex;
-    justify-content:center;
-}
-
-.faucet-card{
-    width:100%;
-    max-width:700px;
-    background:#111827;
-    border:1px solid rgba(255,255,255,.08);
-    border-radius:20px;
-    padding:35px;
-    text-align:center;
-    transition:.3s;
-}
-
-.faucet-card:hover{
-    transform:translateY(-5px);
-    box-shadow:0 20px 40px rgba(245,158,11,.15);
-}
-
-.faucet-card h2{
-    color:#f59e0b;
-    margin-bottom:15px;
-}
-
-.faucet-card p{
-    color:#cbd5e1;
-    margin-bottom:25px;
-}
-
-.faucet-btn{
-    background:#f59e0b;
-    color:#111827;
-    border:none;
-    padding:14px 28px;
-    border-radius:12px;
-    font-size:16px;
-    font-weight:700;
-    cursor:pointer;
-    transition:.3s;
-}
-
-.faucet-btn:hover{
-    background:#fbbf24;
-    transform:translateY(-2px);
-}
-
-/* Roadmap */
-
-.roadmap{
-    padding:70px 8%;
-    display:flex;
-    justify-content:center;
-}
-
-.roadmap-card{
-    width:100%;
-    max-width:800px;
-    background:#111827;
-    border:1px solid rgba(255,255,255,.08);
-    border-radius:20px;
-    padding:35px;
-}
-
-.roadmap-card h2{
-    text-align:center;
-    color:#f59e0b;
-    margin-bottom:25px;
-}
-
-.roadmap-card ul{
-    list-style:none;
-}
-
-.roadmap-card li{
-    padding:14px 0;
-    border-bottom:1px solid rgba(255,255,255,.08);
-    color:#e5e7eb;
-}
-
-.roadmap-card li:last-child{
-    border-bottom:none;
-}
-
-/* Community */
-
-.community{
-    padding:70px 8%;
-    text-align:center;
-}
-
-.community h2{
-    color:#f59e0b;
-    margin-bottom:25px;
-}
-
-.community-buttons{
-    display:flex;
-    justify-content:center;
-    gap:15px;
-    flex-wrap:wrap;
-    margin-bottom:25px;
-}
-
-.community-buttons button{
-    padding:14px 24px;
-    border:none;
-    border-radius:12px;
-    background:#1f2937;
-    color:#ffffff;
-    font-weight:600;
-    cursor:pointer;
-    transition:.3s;
-}
-
-.community-buttons button:hover{
-    background:#f59e0b;
-    color:#111827;
-    transform:translateY(-2px);
-}
-
-.community p{
-    color:#9ca3af;
-}
-
-/* Footer */
-
-footer{
-    margin-top:70px;
-    padding:40px 8%;
-    text-align:center;
-    background:#111827;
-    border-top:1px solid rgba(255,255,255,.08);
-}
-
-footer h2{
-    color:#f59e0b;
-    margin-bottom:15px;
-}
-
-footer p{
-    color:#9ca3af;
-    margin:8px 0;
-}
-
-/* Card Hover */
-
-.demo-card:hover,
-.preview-card:hover,
-.roadmap-card:hover{
-    transform:translateY(-4px);
-    transition:.3s;
-    box-shadow:0 20px 40px rgba(0,0,0,.30);
-}
-/* =========================================
-   THORPAY V2
-   PART 4
-   Responsive + Toast + Animations
-========================================= */
-
-/* Toast */
-
-#toast{
-    min-width:260px;
-    max-width:350px;
-    border-radius:14px;
-    font-size:15px;
-    font-weight:600;
-    box-shadow:0 15px 35px rgba(0,0,0,.35);
-    animation:toastIn .35s ease;
-}
-
-@keyframes toastIn{
-
-    from{
-
-        opacity:0;
-        transform:translateY(30px);
-
-    }
-
-    to{
-
-        opacity:1;
-        transform:translateY(0);
-
-    }
+    animation:fadeUp 1s ease;
 
 }
 
@@ -533,6 +607,7 @@ footer p{
     from{
 
         opacity:0;
+
         transform:translateY(40px);
 
     }
@@ -540,166 +615,75 @@ footer p{
     to{
 
         opacity:1;
+
         transform:translateY(0);
 
     }
 
 }
 
-/* Section Animation */
 
-.hero,
-.demo,
-.transaction-preview,
-.faucet,
-.roadmap,
-.community{
 
-    animation:fadeUp .7s ease;
+/* ======================
+CUSTOM SCROLLBAR
+====================== */
 
-}
+::-webkit-scrollbar{
 
-/* Card Transition */
-
-.demo-card,
-.preview-card,
-.faucet-card,
-.roadmap-card{
-
-    transition:.35s ease;
+    width:10px;
 
 }
 
-.demo-card:hover,
-.preview-card:hover,
-.faucet-card:hover,
-.roadmap-card:hover{
+::-webkit-scrollbar-track{
 
-    transform:translateY(-6px);
-
-    box-shadow:0 20px 45px rgba(245,158,11,.15);
+    background:#0B0F19;
 
 }
 
-/* Input Placeholder */
+::-webkit-scrollbar-thumb{
 
-input::placeholder{
+    background:#2563EB;
 
-    color:#94a3b8;
+    border-radius:20px;
 
 }
 
-/* Selection */
+::-webkit-scrollbar-thumb:hover{
+
+    background:#3B82F6;
+
+}
+
+
+
+/* ======================
+SELECTION
+====================== */
 
 ::selection{
 
-    background:#f59e0b;
-    color:#111827;
+    background:#2563EB;
+
+    color:#fff;
 
 }
 
-/* Button Transition */
+
+
+/* ======================
+SMOOTH TRANSITIONS
+====================== */
 
 button,
-a{
+a,
+.card{
 
     transition:.3s ease;
 
 }
 
-/* Responsive */
 
-@media(max-width:992px){
 
-    .hero h2{
-
-        font-size:2.4rem;
-
-    }
-
-}
-
-@media(max-width:768px){
-
-    .header{
-
-        flex-direction:column;
-        gap:18px;
-        text-align:center;
-
-    }
-
-    .hero{
-
-        padding:70px 25px;
-
-    }
-
-    .hero h2{
-
-        font-size:2rem;
-
-    }
-
-    .hero p{
-
-        font-size:16px;
-
-    }
-
-    .hero-buttons{
-
-        flex-direction:column;
-
-    }
-
-    .primary-btn,
-    .secondary-btn,
-    .wallet-btn,
-    .send-btn,
-    .faucet-btn{
-
-        width:100%;
-
-    }
-
-    .preview-item{
-
-        flex-direction:column;
-        align-items:flex-start;
-        gap:6px;
-
-    }
-
-}
-
-@media(max-width:480px){
-
-    .logo h1{
-
-        font-size:1.7rem;
-
-    }
-
-    .hero h2{
-
-        font-size:1.6rem;
-
-    }
-
-    .demo-card,
-    .preview-card,
-    .faucet-card,
-    .roadmap-card{
-
-        padding:22px;
-
-    }
-
-    footer{
-
-        padding:30px 20px;
-
-    }
-
-}
+/* ======================
+END OF FILE
+====================== */

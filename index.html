@@ -1,318 +1,335 @@
-<!DOCTYPE html>
-<html lang="en">
+<!-- ========================= -->
+<!-- HEADER -->
+<!-- ========================= -->
 
-<head>
+<header class="header">
 
-<meta charset="UTF-8">
+    <div class="logo">
 
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <h1>⚡ ThorPay</h1>
 
-<title>ThorPay | Arc Network Web3 Payments</title>
+        <p>Fast USDC Payments on Arc Network</p>
 
-<meta name="description"
-content="ThorPay is a modern Web3 payment dApp built on Arc Network for fast, secure and low-cost USDC payments.">
+    </div>
 
-<meta name="theme-color"
-content="#39ff88">
+    <button id="connectWallet" class="wallet-btn">
 
-<link rel="stylesheet"
-href="style.css">
+        🟠 Connect Wallet
 
-<link rel="stylesheet"
-href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
-
-<link rel="icon"
-href="https://cdn-icons-png.flaticon.com/512/5968/5968260.png">
-
-</head>
-
-<body>
-
-<header>
-
-<div class="logo">
-
-<h1>⚡ ThorPay</h1>
-
-<p>
-Fast USDC Payments on Arc Network
-</p>
-
-</div>
-
-<button
-id="connectWallet"
-class="wallet-btn">
-
-🟢 Connect Wallet
-
-</button>
+    </button>
 
 </header>
 
+<!-- ========================= -->
+<!-- HERO -->
+<!-- ========================= -->
+
 <section class="hero">
 
-<h2>
+    <div class="hero-content">
 
-Simple, Secure & Instant Payments
+        <span class="hero-badge">
+            Powered by Arc Network
+        </span>
 
-</h2>
+        <h2>
+            Fast, Secure & Low Fee
+            <br>
+            USDC Payments
+        </h2>
 
-<p>
+        <p>
+            ThorPay is a modern Web3 payment application built on
+            Arc Network.
 
-ThorPay is a modern Web3 payment dApp built on Arc Network.
-Send fast, secure and low-cost USDC payments with an elegant
-and developer-friendly interface.
+            Experience lightning-fast USDC transfers with a clean,
+            secure and developer-friendly interface.
 
-</p>
+            This demo showcases the future payment experience that
+            will later integrate Wallet Connect, Arc SDK and
+            real blockchain transactions.
+        </p>
 
-<div class="hero-buttons">
+        <div class="hero-buttons">
 
-<button
-class="wallet-btn"
-id="heroConnect">
+            <button class="primary-btn">
 
-🚀 Launch App
+                🚀 Explore Demo
 
-</button>
+            </button>
 
-<a
-href="https://docs.arc.xyz"
-target="_blank">
+            <a href="#demo" class="secondary-btn">
 
-<button
-class="secondary-btn">
+                Demo Payment ↓
 
-📚 Arc Docs
+            </a>
 
-</button>
+        </div>
 
-</a>
-
-</div>
-
-<div class="status-badge">
-
-🚀 Arc Hackathon Demo • Arc Testnet
-
-</div>
+    </div>
 
 </section>
 
-<section class="stats">
+<!-- ========================= -->
+<!-- DEMO PAYMENT START -->
+<!-- ========================= -->
 
-<div class="stat">
+<section id="demo" class="demo">
 
-<h2>Arc</h2>
+    <div class="demo-card">
 
-<p>Network</p>
+        <h2>💳 Demo Payment</h2>
 
-</div>
+        <p class="demo-subtitle">
 
-<div class="stat">
+            Send a simulated USDC payment on Arc Testnet.
 
-<h2>USDC</h2>
+        </p>
 
-<p>Supported Token</p>
+        <div class="network-badge">
 
-</div>
+            🟠 Arc Testnet
 
-<div class="stat">
+        </div>
 
-<h2>Demo</h2>
+        <div class="token-box">
 
-<p>Web3 Payment</p>
+            <h3>Supported Token</h3>
 
-</div>
+            <p>🪙 USDC Stablecoin</p>
 
-</section>
+        </div>
+                <input
+            type="text"
+            id="walletAddress"
+            placeholder="Enter Wallet Address">
 
-<p class="network">
+        <input
+            type="number"
+            id="amount"
+            placeholder="Amount (USDC)">
 
-🟢 Connected Network : Arc Testnet
+        <button id="sendBtn" class="send-btn">
 
-</p>
-<section class="payment">
+            💸 Send Payment
 
-<h2>💳 Demo Payment</h2>
+        </button>
 
-<div class="token">
+        <p id="status" class="status">
 
-<h3>Supported Token</h3>
+            🔴 Wallet Not Connected
 
-<p>🪙 USDC Stablecoin</p>
+        </p>
 
-</div>
+        <div class="balance-card">
 
-<input
-type="text"
-id="walletAddress"
-placeholder="Enter Wallet Address">
+            <h3>💰 Demo Balance</h3>
 
-<input
-type="number"
-id="amount"
-placeholder="Amount (USDC)">
+            <p>1000 USDC</p>
 
-<button
-id="sendBtn">
+        </div>
 
-🚀 Send Payment
+        <div class="recent-card">
 
-</button>
+            <h3>📜 Recent Transactions</h3>
 
-<p id="status">
+            <ul>
 
-🟢 Status : Ready
+                <li>No transactions yet.</li>
 
-</p>
+            </ul>
 
-<p class="demo-warning">
+        </div>
 
-⚠ Demo UI Only. Real Arc SDK integration coming soon.
-
-</p>
-
-</section>
-
-<section class="faucet">
-
-<h2>
-
-🚰 Get Arc Testnet USDC
-
-</h2>
-
-<p>
-
-Need free USDC for testing?
-
-Use the official Circle Developer Faucet.
-
-</p>
-
-<a
-href="https://faucet.circle.com/#developer-console-faucet"
-target="_blank">
-
-<button>
-
-🌐 Open Circle Faucet
-
-</button>
-
-</a>
+    </div>
 
 </section>
 
-<section class="roadmap">
-
-<h2>
-
-🗺️ Project Roadmap
-
-</h2>
-
-<p>✅ Landing Page Complete</p>
-
-<p>✅ Demo Payment UI</p>
-
-<p>🟡 Wallet Connect Integration</p>
-
-<p>🟡 Arc SDK Integration</p>
-
-<p>🟡 Real USDC Testnet Transfers</p>
-
-<p>🟡 Transaction History</p>
-
-<p>🟡 QR Code Payments</p>
-
-<p>🟡 Multi Wallet Support</p>
-
-<p>🟡 Mobile Responsive Design</p>
-
-<p>🟡 Mainnet Launch</p>
-
-<p>🟡 Merchant Dashboard</p>
-
-<p>🟡 Analytics & Insights</p>
-
-</section>
+<!-- ========================= -->
+<!-- TRANSACTION PREVIEW -->
+<!-- ========================= -->
 
 <section class="transaction-preview">
 
-<h2>
+    <div class="preview-card">
 
-📄 Transaction Preview
+        <h2>📄 Transaction Preview</h2>
 
-</h2>
+        <div class="preview-item">
 
-<div class="preview-box">
+            <span>Network</span>
 
-<p>
+            <strong>Arc Testnet</strong>
 
-<b>Network:</b> Arc Testnet
+        </div>
 
-</p>
+        <div class="preview-item">
 
-<p>
+            <span>Token</span>
 
-<b>Token:</b> USDC
+            <strong>USDC</strong>
 
-</p>
+        </div>
 
-<p>
+        <div class="preview-item">
 
-<b>Gas Fees:</b> Low
+            <span>Gas Fee</span>
 
-</p>
+            <strong>Estimated</strong>
 
-<p>
+        </div>
 
-<b>Status:</b> Waiting for Wallet Connection
+        <div class="preview-item">
 
-</p>
+            <span>Status</span>
 
-</div>
+            <strong id="previewStatus">
+
+                Waiting for Wallet Connection
+
+            </strong>
+
+        </div>
+
+    </div>
 
 </section>
+
+<!-- ========================= -->
+<!-- FAUCET -->
+<!-- ========================= -->
+
+<section class="faucet">
+
+    <div class="faucet-card">
+
+        <h2>🚰 Get Arc Testnet USDC</h2>
+
+        <p>
+
+            Need free test tokens?
+
+            Use the official Circle Faucet.
+
+        </p>
+
+        <a
+
+            href="https://faucet.circle.com/#developer-console-faucet"
+
+            target="_blank">
+
+            <button class="faucet-btn">
+
+                Open Circle Faucet
+
+            </button>
+
+        </a>
+
+    </div>
+
+</section>
+<!-- ========================= -->
+<!-- PROJECT ROADMAP -->
+<!-- ========================= -->
+
+<section class="roadmap">
+
+    <div class="roadmap-card">
+
+        <h2>🗺️ Project Roadmap</h2>
+
+        <ul>
+
+            <li>✅ Landing Page Complete</li>
+
+            <li>✅ Premium UI Design</li>
+
+            <li>🟠 Wallet Connect Integration</li>
+
+            <li>🟠 Arc SDK Integration</li>
+
+            <li>🟠 Real USDC Testnet Transfers</li>
+
+            <li>🟠 Transaction History</li>
+
+            <li>🟠 QR Code Payments</li>
+
+            <li>🟠 Multi Wallet Support</li>
+
+            <li>🟠 Mobile Responsive Optimization</li>
+
+            <li>🟠 Merchant Dashboard</li>
+
+            <li>🟠 Analytics & Insights</li>
+
+            <li>🟠 Mainnet Launch</li>
+
+        </ul>
+
+    </div>
+
+</section>
+
+<!-- ========================= -->
+<!-- COMMUNITY -->
+<!-- ========================= -->
+
 <section class="community">
 
-<h2>🌐 Community</h2>
+    <h2>🌐 Community</h2>
 
-<div class="coming-links">
+    <div class="community-buttons">
 
-<span><i class="fa-brands fa-x-twitter"></i> X</span>
+        <button disabled>X (Coming Soon)</button>
 
-<span><i class="fa-brands fa-discord"></i> Discord</span>
+        <button disabled>Discord</button>
 
-<span><i class="fa-brands fa-telegram"></i> Telegram</span>
+        <button disabled>Telegram</button>
 
-</div>
+    </div>
 
-<p class="community-note">
+    <p>
 
-Official community channels will be available after the public launch.
+        Official community channels will be available after
+        the public launch of ThorPay.
 
-Stay tuned as ThorPay grows on Arc Network.
-
-</p>
+    </p>
 
 </section>
+
+<!-- ========================= -->
+<!-- FOOTER -->
+<!-- ========================= -->
 
 <footer>
 
-<h3>⚡ ThorPay</h3>
+    <h2>⚡ ThorPay</h2>
 
-<p>Fast • Secure • Low Fee Web3 Payments</p>
+    <p>
 
-<br>
+        Fast • Secure • Low Fee USDC Payments
 
-<p>Built by <strong>Prashant Maurya</strong></p>
+    </p>
 
-<p>Powered by Arc Network</p>
+    <p>
 
-<p>Version 1.0 • Demo dApp</p>
+        Built by Prashant Maurya
+
+    </p>
+
+    <p>
+
+        Powered by Arc Network
+
+    </p>
+
+    <p>
+
+        Version 2.0 (UI Preview)
+
+    </p>
 
 </footer>
 

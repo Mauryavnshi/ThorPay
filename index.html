@@ -1,81 +1,78 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-    <title>ThorPay</title>
+    <title>ThorPay | Smart Payments on Arc</title>
 
     <link rel="stylesheet" href="style.css">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
 
-<!-- ========================= -->
-<!-- HEADER -->
-<!-- ========================= -->
-
-<header class="header">
-
+<header>
 
     <div class="logo">
-
-        <h1>⚡ ThorPay</h1>
-
-        <p>Fast USDC Payments on Arc Network</p>
-
+        ⚡ ThorPay
     </div>
 
-    <button id="connectWallet" class="wallet-btn">
+    <nav>
 
-        🟠 Connect Wallet
+        <a href="#features">Features</a>
 
+        <a href="#merchant">Merchant</a>
+
+        <a href="#roadmap">Roadmap</a>
+
+        <a href="https://docs.arc.io" target="_blank">Docs</a>
+
+        <a href="https://github.com" target="_blank">GitHub</a>
+
+    </nav>
+
+    <button id="walletBtn">
+        Connect Wallet
     </button>
 
 </header>
 
-<!-- ========================= -->
-<!-- HERO -->
-<!-- ========================= -->
 
 <section class="hero">
 
     <div class="hero-content">
 
-        <span class="hero-badge">
-            Powered by Arc Network
-        </span>
-
-        <h2>
-            Fast, Secure & Low Fee
-            <br>
-            USDC Payments
-        </h2>
+        <h1>
+            Smart Payments <br>
+            Built on Arc
+        </h1>
 
         <p>
-            ThorPay is a modern Web3 payment application built on
-            Arc Network.
 
-            Experience lightning-fast USDC transfers with a clean,
-            secure and developer-friendly interface.
+            Send, Swap, Bridge and manage
+            USDC effortlessly using Circle App Kit.
 
-            This demo showcases the future payment experience that
-            will later integrate Wallet Connect, Arc SDK and
-            real blockchain transactions.
         </p>
 
         <div class="hero-buttons">
 
             <button class="primary-btn">
 
-                🚀 Explore Demo
+                Launch App
 
             </button>
 
-            <a href="#demo" class="secondary-btn">
+            <a href="https://docs.arc.io" target="_blank">
 
-                Demo Payment ↓
+                <button class="secondary-btn">
+
+                    Documentation
+
+                </button>
 
             </a>
 
@@ -85,270 +82,200 @@
 
 </section>
 
-<!-- ========================= -->
-<!-- DEMO PAYMENT START -->
-<!-- ========================= -->
 
-<section id="demo" class="demo">
 
-    <div class="demo-card">
+<section id="features" class="features">
 
-        <h2>💳 Demo Payment</h2>
+<h2>
 
-        <p class="demo-subtitle">
+Core Features
 
-            Send a simulated USDC payment on Arc Testnet.
+</h2>
 
-        </p>
+<div class="grid">
 
-        <div class="network-badge">
+<div class="card">
 
-            🟠 Arc Testnet
+<h3>
 
-        </div>
+💸 Send
 
-        <div class="token-box">
+</h3>
 
-            <h3>Supported Token</h3>
+<p>
 
-            <p>🪙 USDC Stablecoin</p>
+Transfer USDC instantly on Arc Network.
 
-        </div>
-                <input
-            type="text"
-            id="walletAddress"
-            placeholder="Enter Wallet Address">
+</p>
 
-        <input
-            type="number"
-            id="amount"
-            placeholder="Amount (USDC)">
+</div>
 
-        <button id="sendBtn" class="send-btn">
 
-            💸 Send Payment
+<div class="card">
 
-        </button>
+<h3>
 
-        <p id="status" class="status">
+🌉 Bridge
 
-            🔴 Wallet Not Connected
+</h3>
 
-        </p>
+<p>
 
-        <div class="balance-card">
+Move assets across supported blockchains.
 
-            <h3>💰 Demo Balance</h3>
+</p>
 
-            <p>1000 USDC</p>
+</div>
 
-        </div>
 
-        <div class="recent-card">
+<div class="card">
 
-            <h3>📜 Recent Transactions</h3>
+<h3>
 
-            <ul>
+🔄 Swap
 
-                <li>No transactions yet.</li>
+</h3>
 
-            </ul>
+<p>
 
-        </div>
+Exchange supported assets with App Kit.
 
-    </div>
+</p>
 
-</section>
+</div>
 
-<!-- ========================= -->
-<!-- TRANSACTION PREVIEW -->
-<!-- ========================= -->
 
-<section class="transaction-preview">
+<div class="card">
 
-    <div class="preview-card">
+<h3>
 
-        <h2>📄 Transaction Preview</h2>
+💰 Unified Balance
 
-        <div class="preview-item">
+</h3>
 
-            <span>Network</span>
+<p>
 
-            <strong>Arc Testnet</strong>
+Spend one balance across multiple chains.
 
-        </div>
+</p>
 
-        <div class="preview-item">
+</div>
 
-            <span>Token</span>
-
-            <strong>USDC</strong>
-
-        </div>
-
-        <div class="preview-item">
-
-            <span>Gas Fee</span>
-
-            <strong>Estimated</strong>
-
-        </div>
-
-        <div class="preview-item">
-
-            <span>Status</span>
-
-            <strong id="previewStatus">
-
-                Waiting for Wallet Connection
-
-            </strong>
-
-        </div>
-
-    </div>
+</div>
 
 </section>
 
-<!-- ========================= -->
-<!-- FAUCET -->
-<!-- ========================= -->
 
-<section class="faucet">
 
-    <div class="faucet-card">
 
-        <h2>🚰 Get Arc Testnet USDC</h2>
+<section id="merchant" class="merchant">
 
-        <p>
+<h2>
 
-            Need free test tokens?
+Merchant Tools
 
-            Use the official Circle Faucet.
+</h2>
 
-        </p>
+<div class="grid">
 
-        <a
+<div class="card">
 
-            href="https://faucet.circle.com/#developer-console-faucet"
+<h3>
 
-            target="_blank">
+📱 QR Payments
 
-            <button class="faucet-btn">
+</h3>
 
-                Open Circle Faucet
+</div>
 
-            </button>
+<div class="card">
 
-        </a>
+<h3>
 
-    </div>
+🧾 Invoice
 
-</section>
-<!-- ========================= -->
-<!-- PROJECT ROADMAP -->
-<!-- ========================= -->
+</h3>
 
-<section class="roadmap">
+</div>
 
-    <div class="roadmap-card">
+<div class="card">
 
-        <h2>🗺️ Project Roadmap</h2>
+<h3>
 
-        <ul>
+📊 Analytics
 
-            <li>✅ Landing Page Complete</li>
+</h3>
 
-            <li>✅ Premium UI Design</li>
+</div>
 
-            <li>🟠 Wallet Connect Integration</li>
+<div class="card">
 
-            <li>🟠 Arc SDK Integration</li>
+<h3>
 
-            <li>🟠 Real USDC Testnet Transfers</li>
+📜 Payment History
 
-            <li>🟠 Transaction History</li>
+</h3>
 
-            <li>🟠 QR Code Payments</li>
+</div>
 
-            <li>🟠 Multi Wallet Support</li>
-
-            <li>🟠 Mobile Responsive Optimization</li>
-
-            <li>🟠 Merchant Dashboard</li>
-
-            <li>🟠 Analytics & Insights</li>
-
-            <li>🟠 Mainnet Launch</li>
-
-        </ul>
-
-    </div>
+</div>
 
 </section>
 
-<!-- ========================= -->
-<!-- COMMUNITY -->
-<!-- ========================= -->
 
-<section class="community">
 
-    <h2>🌐 Community</h2>
 
-    <div class="community-buttons">
+<section id="roadmap" class="roadmap">
 
-        <button disabled>X (Coming Soon)</button>
+<h2>
 
-        <button disabled>Discord</button>
+Roadmap
 
-        <button disabled>Telegram</button>
+</h2>
 
-    </div>
+<ul>
 
-    <p>
+<li>✅ Wallet Connection</li>
 
-        Official community channels will be available after
-        the public launch of ThorPay.
+<li>✅ USDC Send</li>
 
-    </p>
+<li>✅ Bridge</li>
+
+<li>✅ Swap</li>
+
+<li>✅ Unified Balance</li>
+
+<li>⬜ Merchant Dashboard</li>
+
+<li>⬜ QR Payments</li>
+
+<li>⬜ AI Payment Assistant</li>
+
+</ul>
 
 </section>
 
-<!-- ========================= -->
-<!-- FOOTER -->
-<!-- ========================= -->
+
+
 
 <footer>
 
-    <h2>⚡ ThorPay</h2>
+<h3>
 
-    <p>
+ThorPay
 
-        Fast • Secure • Low Fee USDC Payments
+</h3>
 
-    </p>
+<p>
 
-    <p>
+Built on Arc Network
 
-        Built by Prashant Maurya
-
-    </p>
-
-    <p>
-
-        Powered by Arc Network
-
-    </p>
-
-
-   <p>© <span id="year"></span> ThorPay. All rights reserved.</p>
-
-
+</p>
 
 </footer>
+
 
 <script src="script.js"></script>
 
 </body>
-
 </html>

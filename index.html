@@ -1,281 +1,664 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <title>ThorPay | Smart Payments on Arc</title>
 
-    <link rel="stylesheet" href="style.css">
+    <meta name="description"
+        content="ThorPay is a modern payment application built on Arc Network with Circle App Kit. Send, Swap and Bridge digital assets securely.">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+
+    <link rel="stylesheet" href="style.css">
+
+    <link rel="icon" type="image/png" href="assets/logo.png">
 </head>
 
 <body>
 
-<header>
+    <!-- ========================= -->
+    <!-- HEADER -->
+    <!-- ========================= -->
 
-    <div class="logo">
-        ⚡ ThorPay
-    </div>
+    <header class="header">
 
-    <nav>
+        <div class="container">
 
-        <a href="#features">Features</a>
+            <nav class="navbar">
 
-        <a href="#merchant">Merchant</a>
+                <!-- Logo -->
 
-        <a href="#roadmap">Roadmap</a>
+                <a href="#" class="logo">
 
-        <a href="https://docs.arc.io" target="_blank">Docs</a>
+                    <span class="logo-icon">⚡</span>
 
-        <a href="https://github.com" target="_blank">GitHub</a>
+                    <div class="logo-text">
 
-    </nav>
+                        <h2>ThorPay</h2>
 
-    <button id="walletBtn">
-        Connect Wallet
-    </button>
+                        <small>Built on Arc</small>
 
-</header>
+                    </div>
 
+                </a>
 
-<section class="hero">
+                <!-- Navigation -->
 
-    <div class="hero-content">
+                <ul class="nav-links">
 
-        <h1>
-            Smart Payments <br>
-            Built on Arc
-        </h1>
+                    <li>
+                        <a href="#" id="nav-send" class="active">
+                            Send
+                        </a>
+                    </li>
 
-        <p>
+                    <li>
+                        <a href="#" id="nav-swap">
+                            Swap
+                        </a>
+                    </li>
 
-            Send, Swap, Bridge and manage
-            USDC effortlessly using Circle App Kit.
+                    <li>
+                        <a href="#" id="nav-bridge">
+                            Bridge
+                        </a>
+                    </li>
 
-        </p>
+                </ul>
 
-        <div class="hero-buttons">
+                <!-- Right Side -->
 
-            <button class="primary-btn">
+                <div class="header-actions">
 
-                Launch App
+                    <button id="connectWalletBtn"
+                        class="wallet-btn">
 
-            </button>
+                        Connect Wallet
 
-            <a href="https://docs.arc.io" target="_blank">
+                    </button>
 
-                <button class="secondary-btn">
+                    <a href="https://faucet.circle.com/#developer-console-faucet"
+                        target="_blank"
+                        class="faucet-btn">
 
-                    Documentation
+                        💧 Testnet Faucet
 
-                </button>
+                    </a>
 
-            </a>
+                </div>
+
+            </nav>
 
         </div>
 
-    </div>
+    </header>
 
-</section>
+    <!-- ========================= -->
+    <!-- MAIN -->
+    <!-- ========================= -->
 
+    <main class="app-container">
 
+        <!-- Send Section Start -->
+        <section id="sendSection" class="page-section active">
+                        <!-- ========================= -->
+            <!-- SEND CARD -->
+            <!-- ========================= -->
 
-<section id="features" class="features">
+            <div class="send-wrapper">
 
-<h2>
+                <div class="send-card">
 
-Core Features
+                    <div class="card-header">
 
-</h2>
+                        <div>
 
-<div class="grid">
+                            <h1>Send Digital Assets</h1>
 
-<div class="card">
+                            <p>
+                                Fast and secure payments powered by
+                                Arc Network & Circle App Kit
+                            </p>
 
-<h3>
+                        </div>
 
-💸 Send
+                        <span class="network-badge">
 
-</h3>
+                            🟢 Arc Testnet
 
-<p>
+                        </span>
 
-Transfer USDC instantly on Arc Network.
+                    </div>
 
-</p>
+                    <!-- Token -->
 
-</div>
+                    <div class="input-group">
 
+                        <label>Select Token</label>
 
-<div class="card">
+                        <select id="tokenSelect">
 
-<h3>
+                            <option value="USDC">USDC</option>
 
-🌉 Bridge
+                            <option value="EURC">EURC</option>
 
-</h3>
+                            <option value="cirBTC">cirBTC</option>
 
-<p>
+                        </select>
 
-Move assets across supported blockchains.
+                    </div>
 
-</p>
+                    <!-- Recipient -->
 
-</div>
+                    <div class="input-group">
 
+                        <label>Recipient Address</label>
 
-<div class="card">
+                        <input
+                            type="text"
+                            id="recipient"
+                            placeholder="0x..."
+                            autocomplete="off">
 
-<h3>
+                    </div>
 
-🔄 Swap
+                    <!-- Amount -->
 
-</h3>
+                    <div class="input-group">
 
-<p>
+                        <label>Amount</label>
 
-Exchange supported assets with App Kit.
+                        <div class="amount-box">
 
-</p>
+                            <input
+                                type="number"
+                                id="amount"
+                                value=""
+                                min="0"
+                                step="0.000001"
+                                placeholder="0.00">
 
-</div>
+                            <button
+                                id="maxBtn"
+                                type="button">
 
+                                MAX
 
-<div class="card">
+                            </button>
 
-<h3>
+                        </div>
 
-💰 Unified Balance
+                    </div>
 
-</h3>
+                    <!-- USD VALUE -->
 
-<p>
+                    <div class="usd-value">
 
-Spend one balance across multiple chains.
+                        ≈
+                        <span id="usdValue">
 
-</p>
+                            $0.00
 
-</div>
+                        </span>
 
-</div>
+                    </div>
 
-</section>
+                    <!-- Wallet Info -->
 
+                    <div class="wallet-info">
 
+                        <div class="wallet-row">
 
+                            <span>
 
-<section id="merchant" class="merchant">
+                                Available Balance
 
-<h2>
+                            </span>
 
-Merchant Tools
+                            <strong id="walletBalance">
 
-</h2>
+                                0.00 USDC
 
-<div class="grid">
+                            </strong>
 
-<div class="card">
+                        </div>
 
-<h3>
+                        <div class="wallet-row">
 
-📱 QR Payments
+                            <span>
 
-</h3>
+                                Estimated Fee
 
-</div>
+                            </span>
 
-<div class="card">
+                            <strong id="networkFee">
 
-<h3>
+                                0.00 USDC
 
-🧾 Invoice
+                            </strong>
 
-</h3>
+                        </div>
 
-</div>
+                        <div class="wallet-row">
 
-<div class="card">
+                            <span>
 
-<h3>
+                                Wallet Status
 
-📊 Analytics
+                            </span>
 
-</h3>
+                            <strong id="walletStatus">
 
-</div>
+                                Not Connected
 
-<div class="card">
+                            </strong>
 
-<h3>
+                        </div>
 
-📜 Payment History
+                    </div>
 
-</h3>
+                    <!-- Button -->
 
-</div>
+                    <button
+                        id="sendBtn"
+                        class="primary-btn">
 
-</div>
+                        Send Assets
 
-</section>
+                    </button>
 
+                </div>
 
+            </div>
 
+            <!-- ========================= -->
+            <!-- RECENT TRANSACTIONS -->
+            <!-- ========================= -->
 
-<section id="roadmap" class="roadmap">
+            <section class="transactions">
 
-<h2>
+                <div class="section-title">
 
-Roadmap
+                    <h2>
 
-</h2>
+                        Recent Transactions
 
-<ul>
+                    </h2>
 
-<li>✅ Wallet Connection</li>
+                    <p>
 
-<li>✅ USDC Send</li>
+                        Your latest transfers will appear here after connecting your wallet.
 
-<li>✅ Bridge</li>
+                    </p>
 
-<li>✅ Swap</li>
+                </div>
 
-<li>✅ Unified Balance</li>
+                <div
+                    id="transactionList"
+                    class="transaction-list">
 
-<li>⬜ Merchant Dashboard</li>
+                    <div class="empty-state">
 
-<li>⬜ QR Payments</li>
+                        No transactions yet.
 
-<li>⬜ AI Payment Assistant</li>
+                    </div>
 
-</ul>
+                </div>
 
-</section>
+            </section>
 
+        </section>
+                <!-- ====================================== -->
+        <!-- SWAP SECTION -->
+        <!-- ====================================== -->
 
+        <section id="swapSection" class="page-section">
 
+            <div class="swap-wrapper">
 
-<footer>
+                <div class="swap-card">
 
-<h3>
+                    <div class="card-header">
 
-ThorPay
+                        <div>
 
-</h3>
+                            <h1>Swap Tokens</h1>
 
-<p>
+                            <p>
+                                Instantly swap supported assets on Arc Network.
+                            </p>
 
-Built on Arc Network
+                        </div>
 
-</p>
+                        <span class="network-badge">
 
-</footer>
+                            🟢 Arc Testnet
 
+                        </span>
 
-<script src="script.js"></script>
+                    </div>
+
+                    <!-- From Token -->
+
+                    <div class="input-group">
+
+                        <label>From</label>
+
+                        <select id="fromToken">
+
+                            <option>USDC</option>
+                            <option>EURC</option>
+                            <option>cirBTC</option>
+
+                        </select>
+
+                    </div>
+
+                    <div class="input-group">
+
+                        <label>Amount</label>
+
+                        <input
+                            type="number"
+                            id="swapAmount"
+                            placeholder="0.00"
+                            step="0.000001">
+
+                    </div>
+
+                    <!-- Swap Arrow -->
+
+                    <div class="swap-arrow">
+
+                        <button
+                            id="swapDirection"
+                            type="button">
+
+                            ⇅
+
+                        </button>
+
+                    </div>
+
+                    <!-- To Token -->
+
+                    <div class="input-group">
+
+                        <label>To</label>
+
+                        <select id="toToken">
+
+                            <option>EURC</option>
+                            <option>USDC</option>
+                            <option>cirBTC</option>
+
+                        </select>
+
+                    </div>
+
+                    <!-- Receive -->
+
+                    <div class="wallet-info">
+
+                        <div class="wallet-row">
+
+                            <span>
+
+                                Estimated Receive
+
+                            </span>
+
+                            <strong id="receiveAmount">
+
+                                0.00
+
+                            </strong>
+
+                        </div>
+
+                        <div class="wallet-row">
+
+                            <span>
+
+                                Price Impact
+
+                            </span>
+
+                            <strong>
+
+                                0%
+
+                            </strong>
+
+                        </div>
+
+                        <div class="wallet-row">
+
+                            <span>
+
+                                Swap Fee
+
+                            </span>
+
+                            <strong>
+
+                                0.00
+
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+                    <button
+                        id="swapBtn"
+                        class="primary-btn">
+
+                        Swap Tokens
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- ====================================== -->
+        <!-- BRIDGE SECTION -->
+        <!-- ====================================== -->
+
+        <section id="bridgeSection" class="page-section">
+
+            <div class="bridge-wrapper">
+
+                <div class="bridge-card">
+
+                    <div class="bridge-icon">
+
+                        🌉
+
+                    </div>
+
+                    <h2>
+
+                        Bridge Coming Soon
+
+                    </h2>
+
+                    <p>
+
+                        Cross-chain transfers will be available in the next ThorPay release.
+
+                    </p>
+
+                    <button
+                        class="primary-btn"
+                        disabled>
+
+                        Coming Soon
+
+                    </button>
+
+                </div>
+
+            </div>
+
+        </section>
+                <!-- ====================================== -->
+        <!-- ROADMAP -->
+        <!-- ====================================== -->
+
+        <section id="roadmap" class="roadmap-section">
+
+            <div class="section-heading">
+
+                <h2>Roadmap</h2>
+
+                <p>
+                    Building the future of payments on Arc Network.
+                </p>
+
+            </div>
+
+            <div class="roadmap-grid">
+
+                <div class="roadmap-card completed">
+
+                    <span class="step">01</span>
+
+                    <h3>Wallet Connection</h3>
+
+                    <p>
+                        Connect MetaMask, Rabby and compatible wallets.
+                    </p>
+
+                </div>
+
+                <div class="roadmap-card active">
+
+                    <span class="step">02</span>
+
+                    <h3>Send Assets</h3>
+
+                    <p>
+                        Send supported Circle assets instantly.
+                    </p>
+
+                </div>
+
+                <div class="roadmap-card">
+
+                    <span class="step">03</span>
+
+                    <h3>Swap</h3>
+
+                    <p>
+                        Swap supported assets using Circle App Kit.
+                    </p>
+
+                </div>
+
+                <div class="roadmap-card">
+
+                    <span class="step">04</span>
+
+                    <h3>Bridge</h3>
+
+                    <p>
+                        Cross-chain asset transfers.
+                    </p>
+
+                </div>
+
+            </div>
+
+        </section>
+
+        <!-- ====================================== -->
+        <!-- COMMUNITY -->
+        <!-- ====================================== -->
+
+        <section id="community" class="community-section">
+
+            <div class="section-heading">
+
+                <h2>Community</h2>
+
+                <p>
+
+                    Follow ThorPay and stay updated.
+
+                </p>
+
+            </div>
+
+            <div class="community-links">
+
+                <a href="#" target="_blank" class="community-btn">
+
+                    𝕏
+
+                    <span>X</span>
+
+                </a>
+
+                <a href="#" target="_blank" class="community-btn">
+
+                    <i class="fab fa-github"></i>
+
+                    <span>GitHub</span>
+
+                </a>
+
+                <a href="#" target="_blank" class="community-btn">
+
+                    <i class="fab fa-discord"></i>
+
+                    <span>Discord</span>
+
+                </a>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- ====================================== -->
+    <!-- FOOTER -->
+    <!-- ====================================== -->
+
+    <footer class="footer">
+
+        <div class="container">
+
+            <p>
+
+                © 2026 ThorPay • Built on Arc Network
+
+            </p>
+
+        </div>
+
+    </footer>
+
+    <!-- Font Awesome -->
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/js/all.min.js"></script>
+
+    <!-- Main JS -->
+
+    <script src="script.js"></script>
 
 </body>
+
 </html>
+            

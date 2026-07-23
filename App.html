@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>ThorPay App | Swap, Bridge & Send on Arc Testnet</title>
+<link rel="icon" type="image/png" href="assets/logo.png" />
+<link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<header>
+  <div class="logo"><img src="assets/logo.png" alt="ThorPay" class="mark" />ThorPay</div>
+  <nav class="main-nav">
+    <a href="index.html">Home</a>
+    <a data-tab="swap" class="active">Swap</a>
+    <a data-tab="bridge">Bridge</a>
+    <a data-tab="send">Send</a>
+    <a data-tab="history">History</a>
+  </nav>
+  <div class="header-right">
+    <div class="pill"><div class="dot"></div>Arc Testnet</div>
+    <a class="btn btn-outline" href="https://faucet.circle.com/#developer-console-faucet" target="_blank">Faucet</a>
+    <a class="btn btn-primary" id="connectBtn">Connect Wallet</a>
+  </div>
+</header>
+
+<main class="app">
+  <div class="welcome" id="welcomeMsg">Welcome to ThorPay</div>
+
+  <div class="balance-card">
+    <div class="label">Total balance</div>
+    <div class="amount" id="totalBalance">$0.00</div>
+    <div class="token-list" id="tokenList">
+      <div class="token-row">
+        <div class="left"><div class="tk-icon usdc">U</div>
+          <div><div class="tk-name">USDC</div><div class="tk-sub">Arc Testnet</div></div>
+        </div>
+        <div class="tk-amt" id="usdcBal">0.00</div>
+      </div>
+      <div class="token-row">
+        <div class="left"><div class="tk-icon eurc">E</div>
+          <div><div class="tk-name">EURC</div><div class="tk-sub">Arc Testnet</div></div>
+        </div>
+        <div class="tk-amt" id="eurcBal">0.00</div>
+      </div>
+      <div class="token-row">
+        <div class="left"><div class="tk-icon cirbtc">B</div>
+          <div><div class="tk-name">cirBTC</div><div class="tk-sub">Not yet publicly available</div></div>
+        </div>
+        <div class="tk-amt disabled">Coming soon</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="tabs">
+    <div class="tab-btn active" data-tab="swap">Swap</div>
+    <div class="tab-btn" data-tab="bridge">Bridge</div>
+    <div class="tab-btn" data-tab="send">Send</div>
+    <div class="tab-btn" data-tab="history">History</div>
+  </div>
+
+  <!-- SWAP -->
+  <div class="panel active" id="panel-swap">
+    <h2>Swap</h2>
+    <div class="field">
+      <div class="flabel">From</div>
+      <div class="row">
+        <input type="number" id="swapFromAmt" placeholder="0.00" />
+        <select id="swapFromToken"><option value="USDC">USDC</option><option value="EURC">EURC</option></select>
+      </div>
+      <div class="balrow"><span id="swapFromBal">Balance: 0.00</span>
+        <div class="pct"><span data-pct="25">25%</span><span data-pct="50">50%</span><span data-pct="75">75%</span><span data-pct="100">100%</span></div>
+      </div>
+    </div>
+    <div class="swap-arrow" id="swapFlip">⇅</div>
+    <div class="field">
+      <div class="flabel">To</div>
+      <div class="row">
+        <input type="text" id="swapToAmt" placeholder="0.00" disabled />
+        <select id="swapToToken"><option value="EURC">EURC</option><option value="USDC">USDC</option></select>
+      </div>
+      <div class="balrow"><span id="swapToBal">Balance: 0.00</span></div>
+    </div>
+    <div class="route-box">
+      <div class="rline"><span>Route</span><span>Circle StableFX</span></div>
+      <div class="rline"><span>Status</span><span>Quote engine not connected yet</span></div>
+    </div>
+    <button class="btn btn-primary btn-block" id="swapBtn" disabled>Connect wallet to swap</button>
+    <div class="status" id="swapStatus"></div>
+    <div class="hint">
+      Swap is wired to Arc's <b>StableFX</b> escrow contract address, but placing real quotes needs
+      Circle's RFQ API (see <a href="https://developers.circle.com/stablefx" target="_blank">developers.circle.com/stablefx</a>).
+      Until that's connected, Swap runs in preview mode and won't submit a transaction.
+    </div>
+  </div>
+
+  <!-- BRIDGE -->
+  <div class="panel" id="panel-bridge">
+    <h2>Bridge (CCTP)</h2>
+    <div class="field">
+      <div class="flabel">From</div>
+      <div class="row">
+        <input type="number" id="bridgeFromAmt" placeholder="0.00" />
+        <select id="bridgeFromToken"><option value="USDC">USDC</option></select>
+      </div>
+      <div class="balrow"><span id="bridgeFromBal">Balance: 0.00</span></div>
+      <select id="bridgeFromChain" style="margin-top:8px;width:100%;">
+        <option value="arc">Arc Testnet</option>
+      </select>
+    </div>
+    <div class="swap-arrow">→</div>
+    <div class="field">
+      <div class="flabel">To</div>
+      <div class="row"><input type="text" id="bridgeToAmt" placeholder="0.00" disabled /><span>USDC</span></div>
+      <select id="bridgeToChain" style="margin-top:8px;width:100%;">
+        <option value="ethSepolia">Ethereum Sepolia</option>
+        <option value="baseSepolia">Base Sepolia</option>
+      </select>
+    </div>
+    <div class="route-box">
+      <div class="rline"><span>Protocol</span><span>Circle CCTP V2</span></div>
+      <div class="rline"><span>Steps</span><span>Approve → Burn (Arc) → Attestation → Mint (destination)</span></div>
+    </div>
+    <button class="btn btn-primary btn-block" id="bridgeBtn" disabled>Connect wallet to bridge</button>
+    <div class="status" id="bridgeStatus"></div>
+    <div class="hint" id="bridgeProgress" style="display:none;"></div>
+    <div class="hint">
+      This burns real USDC on Arc Testnet through Circle's TokenMessengerV2 and checks the attestation
+      through Circle's Iris API. Minting on the destination chain is a separate manual transaction —
+      once your burn is attested, call <code>receiveMessage</code> on that chain's MessageTransmitterV2
+      with your MetaMask connected to the destination network. See
+      <a href="https://developers.circle.com/cctp/evm-smart-contracts" target="_blank">developers.circle.com/cctp/evm-smart-contracts</a>
+      for the verified contract address on your destination chain.
+    </div>
+  </div>
+
+  <!-- SEND -->
+  <div class="panel" id="panel-send">
+    <h2>Send</h2>
+    <div class="field">
+      <div class="flabel">Recipient address</div>
+      <input type="text" id="sendTo" placeholder="0x..." />
+    </div>
+    <div class="field">
+      <div class="flabel">From</div>
+      <div class="row">
+        <input type="number" id="sendAmt" placeholder="0.00" />
+        <select id="sendToken"><option value="USDC">USDC</option><option value="EURC">EURC</option></select>
+      </div>
+      <div class="balrow"><span id="sendBal">Balance: 0.00</span>
+        <div class="pct"><span data-pct="25">25%</span><span data-pct="50">50%</span><span data-pct="75">75%</span><span data-pct="100">100%</span></div>
+      </div>
+    </div>
+    <button class="btn btn-primary btn-block" id="sendBtn" disabled>Connect wallet to send</button>
+    <div class="status" id="sendStatus"></div>
+  </div>
+
+  <!-- HISTORY -->
+  <div class="panel" id="panel-history">
+    <h2>History</h2>
+    <div id="historyList"><div class="status">No transactions yet this session.</div></div>
+  </div>
+
+  <div class="hint">
+    Network: Arc Testnet · RPC <code>https://rpc.testnet.arc.network</code> · Chain ID <code>5042002</code> ·
+    Explorer <a href="https://testnet.arcscan.app" target="_blank">testnet.arcscan.app</a> ·
+    Faucet <a href="https://faucet.circle.com/#developer-console-faucet" target="_blank">faucet.circle.com</a>
+  </div>
+</main>
+
+<footer>
+  <span>ThorPay — an independent testnet project. Not affiliated with Circle or Arc.</span>
+  <span class="social-row">
+    <a href="#" target="_blank" title="X (Twitter) — coming soon" class="social-icon">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 2H22l-7.6 8.7L23.3 22h-6.9l-5.4-6.9L4.8 22H1.7l8.1-9.3L1 2h7l4.9 6.3L18.9 2Zm-1.2 18h1.9L7.4 3.9H5.4L17.7 20Z"/></svg>
+    </a>
+    <a href="#" target="_blank" title="Discord — coming soon" class="social-icon">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M20.3 5.4A18.3 18.3 0 0 0 15.7 4l-.3.5c1.7.5 2.7 1.2 3.7 2-1.6-.8-3.2-1.2-4.9-1.2s-3.3.4-4.9 1.2c1-.8 2.2-1.5 3.7-2L12.7 4a18.3 18.3 0 0 0-4.6 1.4C4.9 9.6 4.1 13.6 4.4 17.6a18.6 18.6 0 0 0 5.6 2.8l.9-1.5c-.9-.3-1.8-.8-2.6-1.3l.6-.5a13 13 0 0 0 10.5 0l.6.5c-.8.5-1.7 1-2.6 1.3l.9 1.5a18.6 18.6 0 0 0 5.6-2.8c.4-4.6-.8-8.6-3.6-12.2ZM9.7 15.3c-.9 0-1.7-.9-1.7-2s.7-2 1.7-2 1.7.9 1.7 2-.8 2-1.7 2Zm6.5 0c-.9 0-1.7-.9-1.7-2s.7-2 1.7-2 1.7.9 1.6 2c0 1.1-.7 2-1.6 2Z"/></svg>
+    </a>
+    <a href="#" target="_blank" title="GitHub" class="social-icon">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.5 2 2 6.6 2 12.3c0 4.5 2.9 8.3 6.8 9.6.5.1.7-.2.7-.5v-1.8c-2.8.6-3.4-1.4-3.4-1.4-.4-1.1-1-1.4-1-1.4-.9-.6.1-.6.1-.6 1 .1 1.5 1 1.5 1 .9 1.5 2.3 1.1 2.9.8.1-.7.3-1.1.6-1.4-2.2-.3-4.6-1.1-4.6-5 0-1.1.4-2 1-2.7-.1-.3-.5-1.4.1-2.8 0 0 .8-.3 2.7 1a9 9 0 0 1 4.9 0c1.9-1.3 2.7-1 2.7-1 .5 1.4.2 2.5.1 2.8.6.7 1 1.6 1 2.7 0 3.9-2.4 4.7-4.6 5 .3.3.6.9.6 1.9v2.8c0 .3.2.6.7.5 4-1.3 6.8-5.1 6.8-9.6C22 6.6 17.5 2 12 2Z"/></svg>
+    </a>
+  </span>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
+<script src="script.js"></script>
+</body>
+</html>

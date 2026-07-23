@@ -151,18 +151,33 @@ async function tokenBalance(tokenAddress) {
 
 async function refreshBalances() {
   if (!provider || !userAddress) return;
-  try {
-    const usdc = await tokenBalance(CONFIG.USDC_ERC20);
-    const eurc = await tokenBalance(CONFIG.EURC_ERC20);
 
-    setText("usdcBal", usdc.toFixed(2));
-    setText("eurcBal", eurc.toFixed(2));
-    setText("totalBalance", "$" + usdc.toFixed(2));
-    setText("swapFromBal", "Balance: " + usdc.toFixed(2));
-    setText("bridgeFromBal", "Balance: " + usdc.toFixed(2));
-    setText("sendBal", "Balance: " + usdc.toFixed(2));
-  } catch (e) {
-    console.error("balance fetch failed", e);
+  // Fetch USDC and EURC independently so one failing doesn't blank out the other,
+  // and surface the failure on screen instead of only logging to console.
+  const [usdcResult, eurcResult] = await Promise.allSettled([
+    tokenBalance(CONFIG.USDC_ERC20),
+    tokenBalance(CONFIG.EURC_ERC20)
+  ]);
+
+  const usdc = usdcResult.status === "fulfilled" ? usdcResult.value : null;
+  const eurc = eurcResult.status === "fulfilled" ? eurcResult.value : null;
+
+  if (usdcResult.status === "rejected") console.error("USDC balance fetch failed", usdcResult.reason);
+  if (eurcResult.status === "rejected") console.error("EURC balance fetch failed", eurcResult.reason);
+
+  setText("usdcBal", usdc !== null ? usdc.toFixed(2) : "—");
+  setText("eurcBal", eurc !== null ? eurc.toFixed(2) : "—");
+  setText("totalBalance", "$" + ((usdc || 0) + (eurc || 0)).toFixed(2));
+  setText("swapFromBal", "Balance: " + (usdc !== null ? usdc.toFixed(2) : "—"));
+  setText("bridgeFromBal", "Balance: " + (usdc !== null ? usdc.toFixed(2) : "—"));
+  setText("sendBal", "Balance: " + (usdc !== null ? usdc.toFixed(2) : "—"));
+
+  if (usdc === null || eurc === null) {
+    const welcome = document.getElementById("welcomeMsg");
+    if (welcome) {
+      welcome.innerText = "Couldn't load balance — check you're on Arc Testnet in MetaMask and reload.";
+      welcome.style.color = "var(--red)";
+    }
   }
 }
 
@@ -204,23 +219,12 @@ if (swapFlip) {
 }
 
 /* -------------------------------------------------------------------------
-   Swap — preview only. Real execution needs Circle's StableFX RFQ API to
-   produce a signed quote for the FxEscrow contract; without that quote,
-   submitting on-chain would just revert. See developers.circle.com/stablefx.
+   Swap — real execution lives in the ES module script at the bottom of
+   app.html (Circle App Kit SDK via esm.sh, needs `type="module"`). This
+   file stays a classic script for browser compatibility with the rest
+   of the app, and exposes the bits that module script needs below via
+   window.ThorPay.
    ------------------------------------------------------------------------- */
-const swapBtn = document.getElementById("swapBtn");
-if (swapBtn) {
-  swapBtn.addEventListener("click", async () => {
-    const statusEl = document.getElementById("swapStatus");
-    if (!signer) { statusEl.className = "status err"; statusEl.innerText = "Connect your wallet first."; return; }
-    const amt = document.getElementById("swapFromAmt").value;
-    if (!amt || Number(amt) <= 0) { statusEl.className = "status err"; statusEl.innerText = "Enter an amount."; return; }
-
-    statusEl.className = "status err";
-    statusEl.innerText = "Swap quotes aren't connected yet — this needs Circle's StableFX RFQ API " +
-      "to sign a quote before FxEscrow (" + CONFIG.STABLEFX_ESCROW + ") will accept it.";
-  });
-}
 
 /* -------------------------------------------------------------------------
    Bridge (CCTP V2) — real burn on Arc Testnet + real attestation check.
@@ -381,3 +385,35 @@ if (window.ethereum) {
   window.ethereum.on("accountsChanged", () => window.location.reload());
   window.ethereum.on("chainChanged", () => window.location.reload());
 }
+
+/* -------------------------------------------------------------------------
+   Auto-reconnect on load — if MetaMask is already authorized for this site
+   (e.g. right after the chainChanged reload above, or on a repeat visit),
+   silently restore the connection and load balances without a second click.
+   eth_accounts (unlike eth_requestAccounts) never prompts, so this is safe
+   to call on every page load.
+   ------------------------------------------------------------------------- */
+(async function autoReconnect() {
+  if (!window.ethereum || !connectBtn) return;
+  try {
+    const accounts = await window.ethereum.request({ method: "eth_accounts" });
+    if (accounts && accounts.length > 0) {
+      await connectWallet();
+    }
+  } catch (e) {
+    console.warn("auto-reconnect skipped", e);
+  }
+})();
+
+/* -------------------------------------------------------------------------
+   Expose wallet state + shared helpers for the App Kit swap module script
+   in app.html (that script is type="module" and can't reliably see this
+   classic script's top-level let/const bindings, so it reads window.ThorPay
+   instead).
+   ------------------------------------------------------------------------- */
+window.ThorPay = {
+  getUserAddress: () => userAddress,
+  getSigner: () => signer,
+  refreshBalances,
+  addHistory
+};

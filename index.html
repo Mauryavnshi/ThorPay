@@ -4,129 +4,88 @@
 <head>
 
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <meta name="viewport"
+          content="width=device-width, initial-scale=1.0">
 
     <title>ThorPay | Smart Payments on Arc</title>
 
     <meta name="description"
-        content="ThorPay is a modern payment dApp built on Arc Network using Circle AppKit. Send, Swap and Bridge assets instantly.">
-
-    <meta name="keywords"
-        content="ThorPay, Arc Network, Circle, AppKit, Crypto Wallet, Web3, USDC">
-
-    <meta name="theme-color" content="#F97316">
+          content="ThorPay - Fast, Secure and Seamless Payments on Arc Network">
 
     <link rel="icon" href="assets/logo.png">
 
     <!-- Google Font -->
 
-    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect"
+          href="https://fonts.googleapis.com">
 
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preconnect"
+          href="https://fonts.gstatic.com"
+          crossorigin>
 
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
-        rel="stylesheet">
+          rel="stylesheet">
 
     <!-- Font Awesome -->
 
     <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+          href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
 
     <!-- CSS -->
 
-    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet"
+          href="style.css">
 
 </head>
 
 <body>
 
-    <!--======================
-        Background Effects
-    =======================-->
+<div class="background-blur blur-1"></div>
+<div class="background-blur blur-2"></div>
 
-    <div class="bg-blur blur-one"></div>
-    <div class="bg-blur blur-two"></div>
-    <div class="grid-overlay"></div>
+<div class="app-container">
 
-    <!--======================
-        HEADER
-    =======================-->
+    <!-- ================= HEADER ================= -->
 
     <header class="header">
 
-        <div class="container nav-container">
+        <div class="header-top">
 
             <!-- Logo -->
 
-            <a href="#" class="logo">
+            <div class="brand">
 
                 <img src="assets/logo.png"
-                    alt="ThorPay Logo"
-                    class="logo-img">
+                     alt="ThorPay Logo"
+                     class="logo">
 
-                <div class="logo-text">
+                <div class="brand-text">
 
-                    <h2>ThorPay</h2>
+                    <h1>ThorPay</h1>
 
-                    <span>Smart Payments on Arc</span>
+                    <p>
+                        Smart Payments on Arc Network
+                    </p>
 
                 </div>
 
-            </a>
+            </div>
 
-            <!-- Navigation -->
+            <!-- Right Buttons -->
 
-            <nav class="navbar">
+            <div class="header-buttons">
 
-                <a href="#"
-                    class="nav-link active"
-                    data-section="send">
-
-                    <i class="fa-solid fa-paper-plane"></i>
-
-                    <span>Send</span>
-
-                </a>
-
-                <a href="#"
-                    class="nav-link"
-                    data-section="swap">
-
-                    <i class="fa-solid fa-right-left"></i>
-
-                    <span>Swap</span>
-
-                </a>
-
-                <a href="#"
-                    class="nav-link"
-                    data-section="bridge">
-
-                    <i class="fa-solid fa-bridge-water"></i>
-
-                    <span>Bridge</span>
-
-                </a>
-
-            </nav>
-
-            <!-- Right Side -->
-
-            <div class="nav-actions">
-
-                <a href="#"
-                    id="faucetBtn"
-                    class="faucet-btn">
+                <button class="faucet-btn">
 
                     <i class="fa-solid fa-droplet"></i>
 
                     Testnet Faucet
 
-                </a>
+                </button>
 
-                <button
-                    id="connectWalletBtn"
-                    class="wallet-btn">
+                <button id="connectWallet"
+                        class="wallet-btn">
 
                     <i class="fa-solid fa-wallet"></i>
 
@@ -138,802 +97,948 @@
 
         </div>
 
-    </header>
+        <!-- Navigation -->
 
-    <!--======================
-        MAIN
-    =======================-->
+        <div class="header-bottom">
 
-    <main class="main">
+            <nav class="navigation">
 
-        <div class="container">
+                <button class="nav-btn active"
+                        data-page="send">
 
-            <!-- Arc Badge -->
+                    <i class="fa-solid fa-paper-plane"></i>
 
-            <div class="network-badge">
+                    <span>Send</span>
 
-                <span class="live-dot"></span>
+                </button>
 
-                Arc Testnet
+                <button class="nav-btn"
+                        data-page="swap">
 
-            </div>
+                    <i class="fa-solid fa-right-left"></i>
 
-            <!-- Send Section Start -->
+                    <span>Swap</span>
 
-            <section
-                id="sendSection"
-                class="page-section active-section">
+                </button>
 
-                <div class="glass-card send-card">
+                <button class="nav-btn"
+                        data-page="bridge">
 
-                    <div class="card-header">
+                    <i class="fa-solid fa-bridge"></i>
 
-                        <div>
+                    <span>Bridge</span>
 
-                            <h2>
+                </button>
 
-                                Send Assets
-
-                            </h2>
-
-                            <p>
-
-                                Fast and secure transfers using Circle AppKit.
-
-                            </p>
-
-                        </div>
-
-                        <div class="network-status">
-
-                            <i class="fa-solid fa-circle"></i>
-
-                            Not Connected
-
-                        </div>
-
-                    </div>
-
-                    <!-- Form continues in Part 2 -->
-                                        <!--======================
-                        SEND FORM
-                    =======================-->
-
-                    <form id="sendForm" class="send-form">
-
-                        <!-- Recipient -->
-
-                        <div class="input-group">
-
-                            <label>
-
-                                Recipient Address
-
-                            </label>
-
-                            <div class="input-box">
-
-                                <i class="fa-solid fa-user"></i>
-
-                                <input
-                                    type="text"
-                                    id="recipientAddress"
-                                    placeholder="0x..............................">
-
-                            </div>
-
-                        </div>
-
-                        <!-- Token -->
-
-                        <div class="input-group">
-
-                            <label>
-
-                                Select Token
-
-                            </label>
-
-                            <div class="select-box">
-
-                                <select id="tokenSelect">
-
-                                    <option value="USDC">
-
-                                        USDC
-
-                                    </option>
-
-                                    <option value="EURC">
-
-                                        EURC
-
-                                    </option>
-
-                                    <option value="cirBTC">
-
-                                        cirBTC
-
-                                    </option>
-
-                                </select>
-
-                            </div>
-
-                        </div>
-
-                        <!-- Amount -->
-
-                        <div class="input-group">
-
-                            <label>
-
-                                Amount
-
-                            </label>
-
-                            <div class="amount-box">
-
-                                <input
-                                    type="number"
-                                    id="amountInput"
-                                    placeholder="0.00">
-
-                                <button
-                                    type="button"
-                                    id="maxBtn">
-
-                                    MAX
-
-                                </button>
-
-                            </div>
-
-                        </div>
-
-                        <!-- Wallet Info -->
-
-                        <div class="wallet-info">
-
-                            <div class="wallet-row">
-
-                                <span>
-
-                                    Available Balance
-
-                                </span>
-
-                                <strong id="walletBalance">
-
-                                    0.00 USDC
-
-                                </strong>
-
-                            </div>
-
-                            <div class="wallet-row">
-
-                                <span>
-
-                                    USD Value
-
-                                </span>
-
-                                <strong id="usdValue">
-
-                                    $0.00
-
-                                </strong>
-
-                            </div>
-
-                            <div class="wallet-row">
-
-                                <span>
-
-                                    Estimated Fee
-
-                                </span>
-
-                                <strong id="networkFee">
-
-                                    --
-
-                                </strong>
-
-                            </div>
-
-                        </div>
-
-                        <!-- Send -->
-
-                        <button
-                            type="submit"
-                            id="sendBtn"
-                            class="primary-btn">
-
-                            <i class="fa-solid fa-paper-plane"></i>
-
-                            Send Assets
-
-                        </button>
-
-                    </form>
-
-                </div>
-
-            </section>
-
-            <!--======================
-                Recent Transactions
-            =======================-->
-
-            <section class="transactions">
-
-                <div class="glass-card">
-
-                    <div class="card-header">
-
-                        <h2>
-
-                            Recent Transactions
-
-                        </h2>
-
-                    </div>
-
-                    <div
-                        id="transactionList"
-                        class="transaction-list">
-
-                        <div class="empty-state">
-
-                            <i class="fa-solid fa-clock-rotate-left"></i>
-
-                            <h3>
-
-                                No Transactions Yet
-
-                            </h3>
-
-                            <p>
-
-                                Your latest transfers will appear here after connecting your wallet.
-
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-            <!-- Swap Section starts in Part 3 -->
-                        <!--======================
-                SWAP SECTION
-            =======================-->
-
-            <section
-                id="swapSection"
-                class="page-section">
-
-                <div class="glass-card swap-card">
-
-                    <div class="card-header">
-
-                        <div>
-
-                            <h2>
-
-                                Swap Assets
-
-                            </h2>
-
-                            <p>
-
-                                Instantly swap supported Arc Network assets.
-
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                    <form id="swapForm">
-
-                        <!-- From -->
-
-                        <div class="swap-box">
-
-                            <div class="swap-top">
-
-                                <span>From</span>
-
-                                <span id="fromBalance">
-
-                                    Balance : 0.00
-
-                                </span>
-
-                            </div>
-
-                            <div class="swap-input">
-
-                                <input
-                                    type="number"
-                                    id="swapAmount"
-                                    placeholder="0.00">
-
-                                <select id="fromToken">
-
-                                    <option>USDC</option>
-                                    <option>EURC</option>
-                                    <option>cirBTC</option>
-
-                                </select>
-
-                            </div>
-
-                        </div>
-
-                        <!-- Reverse -->
-
-                        <div class="swap-center">
-
-                            <button
-                                type="button"
-                                id="swapDirectionBtn"
-                                class="swap-direction">
-
-                                <i class="fa-solid fa-arrow-down-arrow-up"></i>
-
-                            </button>
-
-                        </div>
-
-                        <!-- To -->
-
-                        <div class="swap-box">
-
-                            <div class="swap-top">
-
-                                <span>To</span>
-
-                                <span>
-
-                                    Estimated
-
-                                </span>
-
-                            </div>
-
-                            <div class="swap-input">
-
-                                <input
-                                    type="text"
-                                    id="receiveAmount"
-                                    value="0.00"
-                                    readonly>
-
-                                <select id="toToken">
-
-                                    <option>EURC</option>
-                                    <option>USDC</option>
-                                    <option>cirBTC</option>
-
-                                </select>
-
-                            </div>
-
-                        </div>
-
-                        <!-- Details -->
-
-                        <div class="swap-details">
-
-                            <div class="wallet-row">
-
-                                <span>
-
-                                    Exchange Rate
-
-                                </span>
-
-                                <strong id="exchangeRate">
-
-                                    --
-
-                                </strong>
-
-                            </div>
-
-                            <div class="wallet-row">
-
-                                <span>
-
-                                    Price Impact
-
-                                </span>
-
-                                <strong>
-
-                                    &lt; 0.01%
-
-                                </strong>
-
-                            </div>
-
-                            <div class="wallet-row">
-
-                                <span>
-
-                                    Network Fee
-
-                                </span>
-
-                                <strong id="swapFee">
-
-                                    --
-
-                                </strong>
-
-                            </div>
-
-                        </div>
-
-                        <button
-                            type="submit"
-                            class="primary-btn"
-                            id="swapBtn">
-
-                            <i class="fa-solid fa-right-left"></i>
-
-                            Swap
-
-                        </button>
-
-                    </form>
-
-                </div>
-
-            </section>
-
-            <!--======================
-                BRIDGE SECTION
-            =======================-->
-
-            <section
-                id="bridgeSection"
-                class="page-section">
-
-                <div class="glass-card bridge-card">
-
-                    <div class="card-header">
-
-                        <div>
-
-                            <h2>
-
-                                Bridge Assets
-
-                            </h2>
-
-                            <p>
-
-                                Move assets across supported networks.
-
-                            </p>
-
-                        </div>
-
-                    </div>
-
-                    <div class="coming-soon">
-
-                        <div class="coming-icon">
-
-                            <i class="fa-solid fa-bridge-water"></i>
-
-                        </div>
-
-                        <h3>
-
-                            Coming Soon
-
-                        </h3>
-
-                        <p>
-
-                            Cross-chain transfers will be available in an upcoming release.
-
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </section>
-
-            <!--======================
-                WALLET MODAL
-            =======================-->
-
-            <div
-                id="walletModal"
-                class="wallet-modal">
-
-                <div class="wallet-modal-content">
-
-                    <div class="wallet-modal-header">
-
-                        <h2>
-
-                            Connect Wallet
-
-                        </h2>
-
-                        <button
-                            id="closeWalletModal">
-
-                            <i class="fa-solid fa-xmark"></i>
-
-                        </button>
-
-                    </div>
-
-                    <p class="wallet-subtitle">
-
-                        Select your preferred wallet
-
-                    </p>
-
-                    <div class="wallet-list">
-
-                        <button class="wallet-option" data-wallet="metamask">
-
-                            <i class="fa-brands fa-ethereum"></i>
-
-                            <span>MetaMask</span>
-
-                        </button>
-
-                        <button class="wallet-option" data-wallet="rabby">
-
-                            🐰
-
-                            <span>Rabby Wallet</span>
-
-                        </button>
-
-                        <button class="wallet-option" data-wallet="coinbase">
-
-                            <i class="fa-solid fa-wallet"></i>
-
-                            <span>Coinbase Wallet</span>
-
-                        </button>
-
-                        <button class="wallet-option" data-wallet="walletconnect">
-
-                            <i class="fa-solid fa-qrcode"></i>
-
-                            <span>WalletConnect</span>
-
-                        </button>
-
-                    </div>
-
-                </div>
-
-            </div>
+            </nav>
 
         </div>
+
+    </header>
+
+    <!-- ================= MAIN ================= -->
+
+    <main class="main-content">
+
+        <!-- ================= SEND PAGE ================= -->
+
+        <section id="send-page"
+                 class="page active-page">
+
+        </section>
+
+        <!-- ================= SWAP PAGE ================= -->
+
+        <section id="swap-page"
+                 class="page">
+
+        </section>
+
+        <!-- ================= BRIDGE PAGE ================= -->
+
+        <section id="bridge-page"
+                 class="page">
+
+        </section>
 
     </main>
 
-    <!-- Roadmap starts in Part 4 -->
-            <!--======================
-            ROADMAP
-        =======================-->
+</div>
 
-        <section class="roadmap-section">
+<script src="script.js"></script>
 
-            <div class="section-title">
+</body>
+</html>
+<div class="send-container">
 
-                <h2>Roadmap</h2>
+    <div class="send-card">
 
-                <p>Current progress of ThorPay.</p>
-
-            </div>
-
-            <div class="roadmap-grid">
-
-                <div class="roadmap-card completed">
-
-                    <div class="roadmap-icon">
-
-                        <i class="fa-solid fa-wallet"></i>
-
-                    </div>
-
-                    <h3>Wallet Connection</h3>
-
-                    <p>
-                        MetaMask, Rabby, Coinbase Wallet and WalletConnect integration.
-                    </p>
-
-                </div>
-
-                <div class="roadmap-card active">
-
-                    <div class="roadmap-icon">
-
-                        <i class="fa-solid fa-paper-plane"></i>
-
-                    </div>
-
-                    <h3>Send Assets</h3>
-
-                    <p>
-                        Fast USDC, EURC and cirBTC transfers using Circle AppKit.
-                    </p>
-
-                </div>
-
-                <div class="roadmap-card">
-
-                    <div class="roadmap-icon">
-
-                        <i class="fa-solid fa-right-left"></i>
-
-                    </div>
-
-                    <h3>Swap</h3>
-
-                    <p>
-                        Native token swaps on Arc Network.
-                    </p>
-
-                </div>
-
-                <div class="roadmap-card">
-
-                    <div class="roadmap-icon">
-
-                        <i class="fa-solid fa-bridge-water"></i>
-
-                    </div>
-
-                    <h3>Bridge</h3>
-
-                    <p>
-                        Cross-chain bridge support coming soon.
-                    </p>
-
-                </div>
-
-            </div>
-
-        </section>
-
-        <!--======================
-            COMMUNITY
-        =======================-->
-
-        <section class="community-section">
-
-            <div class="section-title">
-
-                <h2>Community</h2>
-
-                <p>
-                    Stay connected with ThorPay.
-                </p>
-
-            </div>
-
-            <div class="community-grid">
-
-                <a
-                    href="#"
-                    class="community-card">
-
-                    <i class="fa-brands fa-x-twitter"></i>
-
-                    <span>X</span>
-
-                </a>
-
-                <a
-                    href="#"
-                    class="community-card">
-
-                    <i class="fa-brands fa-github"></i>
-
-                    <span>GitHub</span>
-
-                </a>
-
-                <a
-                    href="#"
-                    class="community-card">
-
-                    <i class="fa-brands fa-discord"></i>
-
-                    <span>Discord</span>
-
-                </a>
-
-            </div>
-
-        </section>
-
-    </div>
-
-</main>
-
-<!--======================
-    FOOTER
-=======================-->
-
-<footer class="footer">
-
-    <div class="container footer-container">
-
-        <div class="footer-left">
-
-            <img
-                src="assets/logo.png"
-                class="footer-logo"
-                alt="ThorPay">
+        <div class="card-header">
 
             <div>
 
-                <h3>
-
-                    ThorPay
-
-                </h3>
+                <h2>Send Assets</h2>
 
                 <p>
-
-                    Smart Payments on Arc
-
+                    Fast, secure and low-cost payments on Arc Network.
                 </p>
 
             </div>
 
-        </div>
+            <span class="network-badge">
 
-        <div class="footer-right">
-
-            <span>
-
-                Built on Arc Network
+                Arc Testnet
 
             </span>
 
         </div>
 
+
+        <!-- Recipient -->
+
+        <div class="form-group">
+
+            <label>
+
+                Recipient Address
+
+            </label>
+
+            <input
+
+                type="text"
+
+                id="recipient"
+
+                placeholder="0x........................................">
+
+        </div>
+
+
+
+        <!-- Amount -->
+
+        <div class="form-group">
+
+            <div class="label-row">
+
+                <label>
+
+                    Amount
+
+                </label>
+
+                <button class="max-btn">
+
+                    MAX
+
+                </button>
+
+            </div>
+
+
+            <div class="amount-wrapper">
+
+                <button
+
+                    class="amount-btn"
+
+                    id="minusAmount">
+
+                    <i class="fa-solid fa-minus"></i>
+
+                </button>
+
+
+                <input
+
+                    id="amount"
+
+                    type="number"
+
+                    value="1.0"
+
+                    min="0.1"
+
+                    step="0.1">
+
+
+                <button
+
+                    class="amount-btn"
+
+                    id="plusAmount">
+
+                    <i class="fa-solid fa-plus"></i>
+
+                </button>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- Token -->
+
+        <div class="form-group">
+
+            <label>
+
+                Select Token
+
+            </label>
+
+            <select id="token">
+
+                <option>
+
+                    USDC
+
+                </option>
+
+                <option>
+
+                    EURC
+
+                </option>
+
+                <option>
+
+                    cirBTC
+
+                </option>
+
+            </select>
+
+        </div>
+
+
+
+        <!-- Wallet Info -->
+
+        <div class="wallet-box">
+
+            <div class="wallet-row">
+
+                <span>
+
+                    Wallet
+
+                </span>
+
+                <strong>
+
+                    Not Connected
+
+                </strong>
+
+            </div>
+
+
+            <div class="wallet-row">
+
+                <span>
+
+                    Balance
+
+                </span>
+
+                <strong>
+
+                    0.00 USDC
+
+                </strong>
+
+            </div>
+
+
+            <div class="wallet-row">
+
+                <span>
+
+                    Estimated Fee
+
+                </span>
+
+                <strong>
+
+                    ~0.0002 ARC
+
+                </strong>
+
+            </div>
+
+
+            <div class="wallet-row">
+
+                <span>
+
+                    Network
+
+                </span>
+
+                <strong>
+
+                    Arc Testnet
+
+                </strong>
+
+            </div>
+
+        </div>
+
+
+
+        <!-- Send -->
+
+        <button class="primary-btn">
+
+            <i class="fa-solid fa-paper-plane"></i>
+
+            Send Payment
+
+        </button>
+
     </div>
 
-    <div class="footer-bottom">
 
-        © 2026 ThorPay. All Rights Reserved.
+
+    <!-- Recent Transactions -->
+
+    <div class="transaction-card">
+
+        <div class="transaction-header">
+
+            <h3>
+
+                Recent Transactions
+
+            </h3>
+
+        </div>
+
+
+        <div class="empty-transactions">
+
+            <i class="fa-solid fa-clock-rotate-left"></i>
+
+            <p>
+
+                No recent transactions.
+
+            </p>
+
+            <small>
+
+                Your latest transfers will appear here.
+
+            </small>
+
+        </div>
+
+    </div>
+
+</div>
+<!-- ================= SWAP PAGE ================= -->
+
+<section id="swap-page" class="page">
+
+    <div class="swap-container">
+
+        <div class="swap-card">
+
+            <div class="card-header">
+
+                <h2>Swap Tokens</h2>
+
+                <span class="network-badge">
+                    Arc Testnet
+                </span>
+
+            </div>
+
+
+            <!-- FROM -->
+
+            <div class="swap-box">
+
+                <div class="swap-top">
+
+                    <span>From</span>
+
+                    <span>Balance : 0.00</span>
+
+                </div>
+
+                <div class="swap-input">
+
+                    <input
+                        type="number"
+                        id="swapFromAmount"
+                        value="1.0"
+                        min="0.1"
+                        step="0.1">
+
+                    <select>
+
+                        <option>USDC</option>
+                        <option>EURC</option>
+                        <option>cirBTC</option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+
+            <!-- SWITCH -->
+
+            <div class="swap-middle">
+
+                <button id="swapDirection">
+
+                    <i class="fa-solid fa-arrow-down-arrow-up"></i>
+
+                </button>
+
+            </div>
+
+
+
+            <!-- TO -->
+
+            <div class="swap-box">
+
+                <div class="swap-top">
+
+                    <span>To</span>
+
+                    <span>Balance : 0.00</span>
+
+                </div>
+
+                <div class="swap-input">
+
+                    <input
+                        type="number"
+                        id="swapToAmount"
+                        placeholder="0.00"
+                        readonly>
+
+                    <select>
+
+                        <option>EURC</option>
+                        <option>USDC</option>
+                        <option>cirBTC</option>
+
+                    </select>
+
+                </div>
+
+            </div>
+
+
+
+            <div class="swap-details">
+
+                <div>
+
+                    <span>Rate</span>
+
+                    <strong>1 USDC = 1 EURC</strong>
+
+                </div>
+
+                <div>
+
+                    <span>Estimated Fee</span>
+
+                    <strong>0.0002 ARC</strong>
+
+                </div>
+
+                <div>
+
+                    <span>Slippage</span>
+
+                    <strong>0.5%</strong>
+
+                </div>
+
+            </div>
+
+
+            <button class="primary-btn">
+
+                Swap Tokens
+
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ================= BRIDGE PAGE ================= -->
+
+<section id="bridge-page" class="page">
+
+    <div class="bridge-container">
+
+        <div class="bridge-card">
+
+            <div class="card-header">
+
+                <h2>
+
+                    Bridge Assets
+
+                </h2>
+
+                <span class="network-badge">
+
+                    Cross Chain
+
+                </span>
+
+            </div>
+
+
+
+            <div class="form-group">
+
+                <label>
+
+                    From Chain
+
+                </label>
+
+                <select>
+
+                    <option>Arc Testnet</option>
+
+                    <option>Ethereum Sepolia</option>
+
+                    <option>Base Sepolia</option>
+
+                </select>
+
+            </div>
+
+
+
+            <div class="form-group">
+
+                <label>
+
+                    To Chain
+
+                </label>
+
+                <select>
+
+                    <option>Ethereum Sepolia</option>
+
+                    <option>Arc Testnet</option>
+
+                    <option>Base Sepolia</option>
+
+                </select>
+
+            </div>
+
+
+
+            <div class="form-group">
+
+                <label>
+
+                    Amount
+
+                </label>
+
+                <input
+                    type="number"
+                    value="1.0"
+                    min="0.1"
+                    step="0.1">
+
+            </div>
+
+
+
+            <div class="wallet-box">
+
+                <div class="wallet-row">
+
+                    <span>
+
+                        Estimated Time
+
+                    </span>
+
+                    <strong>
+
+                        ~30 Seconds
+
+                    </strong>
+
+                </div>
+
+                <div class="wallet-row">
+
+                    <span>
+
+                        Bridge Fee
+
+                    </span>
+
+                    <strong>
+
+                        0.0003 ARC
+
+                    </strong>
+
+                </div>
+
+            </div>
+
+
+
+            <button class="primary-btn">
+
+                Bridge Assets
+
+            </button>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<!-- ================= WALLET MODAL ================= -->
+
+<div class="wallet-modal" id="walletModal">
+
+    <div class="wallet-content">
+
+        <div class="wallet-header">
+
+            <h2>
+
+                Connect Wallet
+
+            </h2>
+
+            <button id="closeWallet">
+
+                <i class="fa-solid fa-xmark"></i>
+
+            </button>
+
+        </div>
+
+
+
+        <button class="wallet-option">
+
+            <img
+                src="assets/metamask.png"
+                alt="MetaMask">
+
+            MetaMask
+
+        </button>
+
+
+
+        <button class="wallet-option">
+
+            <img
+                src="assets/rabby.png"
+                alt="Rabby">
+
+            Rabby Wallet
+
+        </button>
+
+
+
+        <button class="wallet-option">
+
+            <img
+                src="assets/coinbase.png"
+                alt="Coinbase">
+
+            Coinbase Wallet
+
+        </button>
+
+
+
+        <button class="wallet-option">
+
+            <img
+                src="assets/walletconnect.png"
+                alt="WalletConnect">
+
+            WalletConnect
+
+        </button>
+
+    </div>
+
+</div>
+<!-- ================= FOOTER ================= -->
+
+<footer class="footer">
+
+    <div class="footer-left">
+
+        <img
+            src="assets/logo.png"
+            alt="ThorPay Logo"
+            class="footer-logo">
+
+        <div>
+
+            <h3>ThorPay</h3>
+
+            <p>
+                Built for Arc Hackathon
+            </p>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="footer-center">
+
+        <a href="#" target="_blank">
+
+            Documentation
+
+        </a>
+
+        <a href="#" target="_blank">
+
+            GitHub
+
+        </a>
+
+        <a href="#" target="_blank">
+
+            Roadmap
+
+        </a>
+
+    </div>
+
+
+
+    <div class="footer-social">
+
+        <a href="#" id="twitterLink">
+
+            <i class="fa-brands fa-x-twitter"></i>
+
+        </a>
+
+        <a href="#" id="discordLink">
+
+            <i class="fa-brands fa-discord"></i>
+
+        </a>
+
+        <a href="#" id="telegramLink">
+
+            <i class="fa-brands fa-telegram"></i>
+
+        </a>
+
+        <a href="#" id="githubLink">
+
+            <i class="fa-brands fa-github"></i>
+
+        </a>
 
     </div>
 
 </footer>
 
-<!--======================
-    JAVASCRIPT
-=======================-->
+
+
+<!-- ================= LOADING ================= -->
+
+<div
+    id="loadingOverlay"
+    class="loading-overlay">
+
+    <div class="loader-circle"></div>
+
+    <p>
+
+        Processing Transaction...
+
+    </p>
+
+</div>
+
+
+
+<!-- ================= SUCCESS TOAST ================= -->
+
+<div
+    id="successToast"
+    class="toast success-toast">
+
+    <i class="fa-solid fa-circle-check"></i>
+
+    <span>
+
+        Transaction Successful
+
+    </span>
+
+</div>
+
+
+
+<!-- ================= ERROR TOAST ================= -->
+
+<div
+    id="errorToast"
+    class="toast error-toast">
+
+    <i class="fa-solid fa-circle-xmark"></i>
+
+    <span>
+
+        Something went wrong
+
+    </span>
+
+</div>
+
+
+
+<!-- ================= INFO TOAST ================= -->
+
+<div
+    id="infoToast"
+    class="toast info-toast">
+
+    <i class="fa-solid fa-circle-info"></i>
+
+    <span>
+
+        Wallet Connected
+
+    </span>
+
+</div>
+
+
+
+<!-- ================= CONFIRM MODAL ================= -->
+
+<div
+    id="confirmModal"
+    class="confirm-modal">
+
+    <div class="confirm-card">
+
+        <h2>
+
+            Confirm Transaction
+
+        </h2>
+
+        <p>
+
+            Please review your transaction before continuing.
+
+        </p>
+
+        <div class="confirm-details">
+
+            <div>
+
+                <span>Amount</span>
+
+                <strong id="confirmAmount">
+
+                    1 USDC
+
+                </strong>
+
+            </div>
+
+            <div>
+
+                <span>Recipient</span>
+
+                <strong id="confirmRecipient">
+
+                    0x....
+
+                </strong>
+
+            </div>
+
+            <div>
+
+                <span>Network Fee</span>
+
+                <strong>
+
+                    0.0002 ARC
+
+                </strong>
+
+            </div>
+
+        </div>
+
+        <div class="confirm-buttons">
+
+            <button
+                id="cancelTransaction"
+                class="secondary-btn">
+
+                Cancel
+
+            </button>
+
+            <button
+                id="confirmTransaction"
+                class="primary-btn">
+
+                Confirm
+
+            </button>
+
+        </div>
+
+    </div>
+
+</div>
+
+
 
 <script src="script.js"></script>
 
 </body>
 
 </html>
-    

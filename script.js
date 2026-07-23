@@ -1,812 +1,638 @@
-/*==================================================
-  THORPAY
-  SCRIPT.JS
-  PART 1
-==================================================*/
+/* ==========================================
+   THORPAY V2
+========================================== */
 
-/*==================================================
-  ELEMENTS
-==================================================*/
+const pages = document.querySelectorAll(".page");
+const navButtons = document.querySelectorAll(".nav-btn");
 
-const navLinks = document.querySelectorAll(".nav-links a");
+/* ==========================================
+PAGE SWITCH
+========================================== */
 
-const sections = document.querySelectorAll(".page-section");
+navButtons.forEach(button => {
 
-const walletModal = document.getElementById("walletModal");
+    button.addEventListener("click", () => {
 
-const connectWalletBtn = document.getElementById("connectWalletBtn");
+        navButtons.forEach(btn => {
 
-const closeWalletModal = document.getElementById("closeWalletModal");
-
-const faucetBtn = document.getElementById("faucetBtn");
-
-const maxBtn = document.getElementById("maxBtn");
-
-const amountInput = document.getElementById("amountInput");
-
-const tokenSelect = document.getElementById("tokenSelect");
-
-const sendForm = document.getElementById("sendForm");
-
-const swapForm = document.getElementById("swapForm");
-
-const transactionList = document.getElementById("transactionList");
-
-const walletBalance = document.getElementById("walletBalance");
-
-const usdValue = document.getElementById("usdValue");
-
-const networkFee = document.getElementById("networkFee");
-
-const walletOptions = document.querySelectorAll(".wallet-option");
-
-/*==================================================
-  APP STATE
-==================================================*/
-
-const state = {
-
-    walletConnected:false,
-
-    walletAddress:"",
-
-    network:"",
-
-    balances:{
-
-        USDC:0,
-
-        EURC:0,
-
-        cirBTC:0
-
-    },
-
-    transactions:[]
-
-};
-
-/*==================================================
-  INIT
-==================================================*/
-
-document.addEventListener("DOMContentLoaded",()=>{
-
-    initNavigation();
-
-    initWalletModal();
-
-    initSendForm();
-
-    initSwapForm();
-
-    initButtons();
-
-    renderWallet();
-
-    renderTransactions();
-
-});
-
-/*==================================================
-  NAVIGATION
-==================================================*/
-
-function initNavigation(){
-
-    navLinks.forEach(link=>{
-
-        link.addEventListener("click",(e)=>{
-
-            e.preventDefault();
-
-            const target = link.dataset.section;
-
-            showSection(target);
+            btn.classList.remove("active");
 
         });
 
-    });
+        button.classList.add("active");
 
-}
+        const page = button.dataset.page;
 
-function showSection(id){
+        pages.forEach(section => {
 
-    sections.forEach(section=>{
+            section.classList.remove("active-page");
 
-        section.style.display="none";
+        });
 
-    });
-
-    navLinks.forEach(link=>{
-
-        link.classList.remove("active");
+        document
+            .getElementById(page + "-page")
+            .classList.add("active-page");
 
     });
 
-    const activeSection=document.getElementById(id);
+});
 
-    if(activeSection){
 
-        activeSection.style.display="block";
+/* ==========================================
+AMOUNT
+========================================== */
 
-    }
+const amountInput = document.getElementById("amount");
 
-    document
+const plusButton = document.getElementById("plusAmount");
 
-        .querySelector(`[data-section="${id}"]`)
+const minusButton = document.getElementById("minusAmount");
 
-        ?.classList
 
-        .add("active");
+if(amountInput){
 
-}
+    plusButton.addEventListener("click",()=>{
 
-/*==================================================
-  WALLET MODAL
-==================================================*/
+        let value=parseFloat(amountInput.value)||0.1;
 
-function initWalletModal(){
+        value++;
 
-    connectWalletBtn?.addEventListener(
+        amountInput.value=value.toFixed(1);
 
-        "click",
+    });
 
-        ()=>{
 
-            walletModal.classList.add("active");
+    minusButton.addEventListener("click",()=>{
+
+        let value=parseFloat(amountInput.value)||0.1;
+
+        value--;
+
+        if(value<0.1){
+
+            value=0.1;
 
         }
 
-    );
+        amountInput.value=value.toFixed(1);
 
-    closeWalletModal?.addEventListener(
+    });
 
-        "click",
 
-        ()=>{
+    amountInput.addEventListener("change",()=>{
+
+        let value=parseFloat(amountInput.value);
+
+        if(isNaN(value)||value<0.1){
+
+            amountInput.value=0.1;
+
+        }
+
+    });
+
+}
+
+
+/* ==========================================
+MOUSE WHEEL DISABLE
+========================================== */
+
+document.querySelectorAll("input[type=number]")
+
+.forEach(input=>{
+
+    input.addEventListener("wheel",e=>{
+
+        e.preventDefault();
+
+    });
+/* ==========================================
+   WALLET MODAL
+========================================== */
+
+const walletModal = document.getElementById("walletModal");
+
+const connectWalletBtn = document.getElementById("connectWallet");
+
+const closeWalletBtn = document.getElementById("closeWallet");
+
+
+if(connectWalletBtn && walletModal){
+
+    connectWalletBtn.addEventListener("click",()=>{
+
+        walletModal.classList.add("active");
+
+    });
+
+}
+
+
+if(closeWalletBtn){
+
+    closeWalletBtn.addEventListener("click",()=>{
+
+        walletModal.classList.remove("active");
+
+    });
+
+}
+
+
+if(walletModal){
+
+    walletModal.addEventListener("click",(event)=>{
+
+        if(event.target===walletModal){
 
             walletModal.classList.remove("active");
 
         }
 
-    );
-
-    walletModal?.addEventListener(
-
-        "click",
-
-        (e)=>{
-
-            if(e.target===walletModal){
-
-                walletModal.classList.remove("active");
-
-            }
-
-        }
-
-    );
+    });
 
 }
 
-/*==================================================
-  BUTTONS
-==================================================*/
 
-function initButtons(){
+/* ==========================================
+TOAST
+========================================== */
 
-    maxBtn?.addEventListener(
+function showToast(id,message){
 
-        "click",
+    const toast=document.getElementById(id);
 
-        ()=>{
+    if(!toast) return;
 
-            const token=tokenSelect.value;
+    const text=toast.querySelector("span");
 
-            amountInput.value=state.balances[token];
+    if(text){
 
-            updateUsdValue();
+        text.textContent=message;
 
-        }
+    }
 
-    );
+    toast.classList.add("show");
 
-    faucetBtn?.addEventListener(
+    setTimeout(()=>{
 
-        "click",
+        toast.classList.remove("show");
 
-        ()=>{
-
-            alert(
-
-                "Circle Testnet Faucet will open here."
-
-            );
-
-        }
-
-    );
+    },3000);
 
 }
 
-/*==================================================
-  PLACEHOLDER
-==================================================*/
 
-walletOptions.forEach(wallet=>{
+/* ==========================================
+LOADING
+========================================== */
 
-    wallet.addEventListener(
+const loadingOverlay=document.getElementById("loadingOverlay");
 
-        "click",
 
-        ()=>{
+function showLoading(){
 
-            alert(
+    if(loadingOverlay){
 
-                "Wallet integration will be added in next stage."
+        loadingOverlay.classList.add("active");
+
+    }
+
+}
+
+
+function hideLoading(){
+
+    if(loadingOverlay){
+
+        loadingOverlay.classList.remove("active");
+
+    }
+
+}
+
+
+/* ==========================================
+CONFIRM MODAL
+========================================== */
+
+const confirmModal=document.getElementById("confirmModal");
+
+const sendButton=document.querySelector(".primary-btn");
+
+const confirmButton=document.getElementById("confirmTransaction");
+
+const cancelButton=document.getElementById("cancelTransaction");
+
+
+if(sendButton){
+
+    sendButton.addEventListener("click",()=>{
+
+        if(confirmModal){
+
+            confirmModal.classList.add("active");
+
+        }
+
+    });
+
+}
+
+
+if(cancelButton){
+
+    cancelButton.addEventListener("click",()=>{
+
+        confirmModal.classList.remove("active");
+
+    });
+
+}
+
+
+if(confirmButton){
+
+    confirmButton.addEventListener("click",()=>{
+
+        confirmModal.classList.remove("active");
+
+        showLoading();
+
+        setTimeout(()=>{
+
+            hideLoading();
+
+            showToast(
+
+                "successToast",
+
+                "Transaction Successful"
 
             );
 
+        },2000);
+
+    });
+
+}
+
+
+/* ==========================================
+MAX BUTTON
+========================================== */
+
+const maxButton=document.querySelector(".max-btn");
+
+if(maxButton && amountInput){
+
+    maxButton.addEventListener("click",()=>{
+
+        amountInput.value="100.0";
+
+    });
+
+}
+  /* ==========================================
+   WALLET MODAL
+========================================== */
+
+const walletModal = document.getElementById("walletModal");
+
+const connectWalletBtn = document.getElementById("connectWallet");
+
+const closeWalletBtn = document.getElementById("closeWallet");
+
+
+if(connectWalletBtn && walletModal){
+
+    connectWalletBtn.addEventListener("click",()=>{
+
+        walletModal.classList.add("active");
+
+    });
+
+}
+
+
+if(closeWalletBtn){
+
+    closeWalletBtn.addEventListener("click",()=>{
+
+        walletModal.classList.remove("active");
+
+    });
+
+}
+
+
+if(walletModal){
+
+    walletModal.addEventListener("click",(event)=>{
+
+        if(event.target===walletModal){
+
+            walletModal.classList.remove("active");
+
         }
+
+    });
+
+}
+
+
+/* ==========================================
+TOAST
+========================================== */
+
+function showToast(id,message){
+
+    const toast=document.getElementById(id);
+
+    if(!toast) return;
+
+    const text=toast.querySelector("span");
+
+    if(text){
+
+        text.textContent=message;
+
+    }
+
+    toast.classList.add("show");
+
+    setTimeout(()=>{
+
+        toast.classList.remove("show");
+
+    },3000);
+
+}
+
+
+/* ==========================================
+LOADING
+========================================== */
+
+const loadingOverlay=document.getElementById("loadingOverlay");
+
+
+function showLoading(){
+
+    if(loadingOverlay){
+
+        loadingOverlay.classList.add("active");
+
+    }
+
+}
+
+
+function hideLoading(){
+
+    if(loadingOverlay){
+
+        loadingOverlay.classList.remove("active");
+
+    }
+
+}
+
+
+/* ==========================================
+CONFIRM MODAL
+========================================== */
+
+const confirmModal=document.getElementById("confirmModal");
+
+const sendButton=document.querySelector(".primary-btn");
+
+const confirmButton=document.getElementById("confirmTransaction");
+
+const cancelButton=document.getElementById("cancelTransaction");
+
+
+if(sendButton){
+
+    sendButton.addEventListener("click",()=>{
+
+        if(confirmModal){
+
+            confirmModal.classList.add("active");
+
+        }
+
+    });
+
+}
+
+
+if(cancelButton){
+
+    cancelButton.addEventListener("click",()=>{
+
+        confirmModal.classList.remove("active");
+
+    });
+
+}
+
+
+if(confirmButton){
+
+    confirmButton.addEventListener("click",()=>{
+
+        confirmModal.classList.remove("active");
+
+        showLoading();
+
+        setTimeout(()=>{
+
+            hideLoading();
+
+            showToast(
+
+                "successToast",
+
+                "Transaction Successful"
+
+            );
+
+        },2000);
+
+    });
+
+}
+
+
+/* ==========================================
+MAX BUTTON
+========================================== */
+
+const maxButton=document.querySelector(".max-btn");
+
+if(maxButton && amountInput){
+
+    maxButton.addEventListener("click",()=>{
+
+        amountInput.value="100.0";
+
+    });
+
+}
+  /* ==========================================
+   SWAP BUTTON (DEMO)
+========================================== */
+
+const swapButton = document.getElementById("swapButton");
+
+if (swapButton) {
+
+    swapButton.addEventListener("click", () => {
+
+        showLoading();
+
+        setTimeout(() => {
+
+            hideLoading();
+
+            showToast(
+
+                "successToast",
+
+                "Swap Completed Successfully"
+
+            );
+
+        }, 2000);
+
+    });
+
+}
+
+
+/* ==========================================
+NETWORK STATUS (DEMO)
+========================================== */
+
+const networkBadge = document.querySelectorAll(".network-badge");
+
+networkBadge.forEach((badge) => {
+
+    badge.title = "Connected to Arc Testnet";
+
+});
+
+
+/* ==========================================
+COPY RECIPIENT
+========================================== */
+
+if (recipientInput) {
+
+    recipientInput.addEventListener("dblclick", () => {
+
+        navigator.clipboard.writeText(recipientInput.value);
+
+        showToast(
+
+            "infoToast",
+
+            "Address Copied"
+
+        );
+
+    });
+
+}
+
+
+/* ==========================================
+INPUT FORMAT
+========================================== */
+
+document.querySelectorAll("input[type='number']").forEach((input) => {
+
+    input.addEventListener("blur", () => {
+
+        let value = parseFloat(input.value);
+
+        if (isNaN(value) || value < 0.1) {
+
+            value = 0.1;
+
+        }
+
+        input.value = value.toFixed(1);
+
+    });
+
+});
+
+
+/* ==========================================
+UTILITY
+========================================== */
+
+function enableButton(button) {
+
+    if (!button) return;
+
+    button.disabled = false;
+
+    button.style.opacity = "1";
+
+}
+
+function disableButton(button) {
+
+    if (!button) return;
+
+    button.disabled = true;
+
+    button.style.opacity = ".6";
+
+}
+
+
+/* ==========================================
+INITIALIZE
+========================================== */
+
+window.addEventListener("load", () => {
+
+    console.log("ThorPay V2 Loaded");
+
+    showToast(
+
+        "infoToast",
+
+        "Welcome to ThorPay"
 
     );
 
 });
 
-/*==================================================
-  SEND FORM
-==================================================*/
 
-function initSendForm(){
-
-    if(!sendForm) return;
-
-    amountInput?.addEventListener(
-
-        "input",
-
-        updateUsdValue
-
-    );
-
-    tokenSelect?.addEventListener(
-
-        "change",
-
-        ()=>{
-
-            updateUsdValue();
-
-            updateWalletBalance();
-
-        }
-
-    );
-
-    sendForm.addEventListener(
-
-        "submit",
-
-        handleSend
-
-    );
-
-}
-
-function handleSend(e){
-
-    e.preventDefault();
-
-    if(!state.walletConnected){
-
-        notify(
-
-            "Please connect your wallet first.",
-            "error"
-        );
-
-        return;
-
-    }
-
-    const recipient=document
-
-        .getElementById("recipientAddress")
-
-        .value
-
-        .trim();
-
-    const amount=parseFloat(
-
-        amountInput.value
-
-    );
-
-    const token=tokenSelect.value;
-
-    if(recipient===""){
-
-        notify(
-
-            "Recipient address is required.",
-            "error"
-        );
-
-        return;
-
-    }
-
-    if(isNaN(amount)||amount<=0){
-
-        notify(
-
-            "Enter a valid amount.",
-            "error"
-        );
-
-        return;
-
-    }
-
-    if(amount>state.balances[token]){
-
-        notify(
-
-            "Insufficient balance.",
-            "error"
-        );
-
-        return;
-
-    }
-
-    addTransaction({
-
-        type:"Send",
-
-        token,
-
-        amount,
-
-        address:recipient,
-
-        status:"Pending",
-
-        time:new Date().toLocaleTimeString()
-
-    });
-
-    notify(
-
-        "Transaction prepared. Web3 execution will be added later.",
-
-        "success"
-
-    );
-
-    sendForm.reset();
-
-    updateUsdValue();
-
-    updateWalletBalance();
-
-}
-
-/*==================================================
-  SWAP FORM
-==================================================*/
-
-function initSwapForm(){
-
-    if(!swapForm) return;
-
-    swapForm.addEventListener(
-
-        "submit",
-
-        handleSwap
-
-    );
-
-    const swapAmount=
-
-        document.getElementById(
-
-            "swapAmount"
-
-        );
-
-    swapAmount?.addEventListener(
-
-        "input",
-
-        updateReceiveEstimate
-
-    );
-
-    document
-
-        .getElementById(
-
-            "swapDirectionBtn"
-
-        )
-
-        ?.addEventListener(
-
-            "click",
-
-            reverseSwap
-
-        );
-
-}
-
-function handleSwap(e){
-
-    e.preventDefault();
-
-    if(!state.walletConnected){
-
-        notify(
-
-            "Connect wallet first.",
-
-            "error"
-
-        );
-
-        return;
-
-    }
-
-    notify(
-
-        "Swap integration will be enabled after Circle SDK integration.",
-
-        "success"
-
-    );
-
-}
-
-function reverseSwap(){
-
-    const from=
-
-        document.getElementById(
-
-            "fromToken"
-
-        );
-
-    const to=
-
-        document.getElementById(
-
-            "toToken"
-
-        );
-
-    const value=from.value;
-
-    from.value=to.value;
-
-    to.value=value;
-
-    updateReceiveEstimate();
-
-}
-
-function updateReceiveEstimate(){
-
-    const amount=parseFloat(
-
-        document
-
-        .getElementById(
-
-            "swapAmount"
-
-        ).value||0
-
-    );
-
-    document
-
-        .getElementById(
-
-            "receiveAmount"
-
-        ).value=amount.toFixed(2);
-
-}
-
-/*==================================================
-  WALLET DATA
-==================================================*/
-
-function updateWalletBalance(){
-
-    const token=tokenSelect.value;
-
-    walletBalance.textContent=
-
-        `${state.balances[token]} ${token}`;
-
-}
-
-function updateUsdValue(){
-
-    const value=parseFloat(
-
-        amountInput.value||0
-
-    );
-
-    usdValue.textContent=
-
-        `$${value.toFixed(2)}`;
-
-    networkFee.textContent=
-
-        value===0
-
-        ? "--"
-
-        : "~ $0.01";
-
-}
-/*==================================================
-  TRANSACTIONS
-==================================================*/
-
-function addTransaction(transaction){
-
-    state.transactions.unshift(transaction);
-
-    renderTransactions();
-
-}
-
-function renderTransactions(){
-
-    if(!transactionList) return;
-
-    if(state.transactions.length===0){
-
-        transactionList.innerHTML=`
-
-            <div class="empty-state">
-
-                <i class="fa-solid fa-clock-rotate-left"></i>
-
-                <h3>No Transactions Yet</h3>
-
-                <p>
-
-                    Your latest transfers will appear here after connecting your wallet.
-
-                </p>
-
-            </div>
-
-        `;
-
-        return;
-
-    }
-
-    transactionList.innerHTML="";
-
-    state.transactions.forEach(tx=>{
-
-        const item=document.createElement("div");
-
-        item.className="transaction-item";
-
-        item.innerHTML=`
-
-            <div>
-
-                <strong>${tx.type}</strong>
-
-                <p>${tx.amount} ${tx.token}</p>
-
-                <small>${tx.address}</small>
-
-            </div>
-
-            <div style="text-align:right">
-
-                <strong>${tx.status}</strong>
-
-                <br>
-
-                <small>${tx.time}</small>
-
-            </div>
-
-        `;
-
-        transactionList.appendChild(item);
-
-    });
-
-}
-
-/*==================================================
-  WALLET RENDER
-==================================================*/
-
-function renderWallet(){
-
-    if(!connectWalletBtn) return;
-
-    if(state.walletConnected){
-
-        const shortAddress=
-
-            state.walletAddress.slice(0,6)+
-
-            "..."
-
-            +
-
-            state.walletAddress.slice(-4);
-
-        connectWalletBtn.textContent=
-
-            shortAddress;
-
-    }else{
-
-        connectWalletBtn.textContent=
-
-            "Connect Wallet";
-
-    }
-
-    updateWalletBalance();
-
-}
-
-/*==================================================
-  NOTIFICATION
-==================================================*/
-
-function notify(message,type="success"){
-
-    const toast=document.createElement("div");
-
-    toast.className=`toast ${type}`;
-
-    toast.textContent=message;
-
-    Object.assign(toast.style,{
-
-        position:"fixed",
-
-        right:"20px",
-
-        bottom:"20px",
-
-        padding:"14px 18px",
-
-        borderRadius:"12px",
-
-        background:
-
-            type==="success"
-
-            ?"#22c55e"
-
-            :"#ef4444",
-
-        color:"#fff",
-
-        fontWeight:"600",
-
-        zIndex:"99999",
-
-        boxShadow:
-
-            "0 12px 30px rgba(0,0,0,.25)",
-
-        opacity:"0",
-
-        transform:"translateY(20px)",
-
-        transition:"all .25s ease"
-
-    });
-
-    document.body.appendChild(toast);
-
-    requestAnimationFrame(()=>{
-
-        toast.style.opacity="1";
-
-        toast.style.transform="translateY(0)";
-
-    });
-
-    setTimeout(()=>{
-
-        toast.style.opacity="0";
-
-        toast.style.transform="translateY(20px)";
-
-        setTimeout(()=>{
-
-            toast.remove();
-
-        },250);
-
-    },2500);
-
-}
-
-/*==================================================
-  HELPERS
-==================================================*/
-
-function resetForms(){
-
-    sendForm?.reset();
-
-    swapForm?.reset();
-
-    updateUsdValue();
-
-    updateWalletBalance();
-
-}
-
-function formatNumber(value){
-
-    return Number(value).toLocaleString(
-
-        undefined,
-
-        {
-
-            minimumFractionDigits:2,
-
-            maximumFractionDigits:2
-
-        }
-
-    );
-
-}
-
-function isWalletConnected(){
-
-    return state.walletConnected;
-
-}
-/*==================================================
-  APP STARTUP
-==================================================*/
-
-function initializeApp(){
-
-    showSection("sendSection");
-
-    updateWalletBalance();
-
-    updateUsdValue();
-
-    renderWallet();
-
-    renderTransactions();
-
-}
-
-initializeApp();
-
-/*==================================================
-  KEY
+/* ==========================================
+PLACEHOLDER FOR FUTURE
+========================================== */
+
+// TODO:
+// Circle Wallet SDK
+// WalletConnect
+// MetaMask Provider
+// Rabby Detection
+// Coinbase Wallet
+// Arc RPC
+// Real Token Balance
+// Real Send Transaction
+// Real Swap
+// Real Bridge
+// Transaction History
+// QR Code Payments
+// Theme Toggle
+// Settings Page
+// Multi-language Support
+});

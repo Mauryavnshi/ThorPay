@@ -4,33 +4,36 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>ThorPay — Smart Payments on Arc Testnet</title>
-<link rel="icon" type="image/png" href="assets/logo.png" />
+<link rel="icon" type="image/png" href="logo.png" />
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
 <header>
   <div class="logo">
-    <img src="assets/logo.png" alt="ThorPay" class="mark" />
-    <div>
-      <div>ThorPay</div>
-      <div class="tagline">⚡ Thunder-Speed Stablecoin Transactions</div>
+    <img src="logo.png" alt="ThorPay" class="mark" />
+    <div class="logo-text">
+      <div class="logo-title">ThorPay</div>
+      <div class="tagline">⚡️ Thunder-Speed Stablecoin Transactions</div>
     </div>
   </div>
   <nav class="main-nav">
     <a href="#features">Features</a>
     <a href="#merchant">Merchant</a>
     <a href="#roadmap">Roadmap</a>
-    <a href="https://docs.arc.io/arc/references/connect-to-arc" target="_blank">Docs</a>
+    <a href="javascript:void(0)" title="Docs coming soon">Docs</a>
     <a href="https://github.com/" target="_blank">GitHub</a>
   </nav>
   <div class="header-right">
-    <div class="pill" id="networkPill"><div class="dot" id="networkDot"></div><span id="networkLabel">Not connected</span></div>
-    <button class="btn btn-primary" id="switchBtn" style="display:none;">Switch to Arc Testnet</button>
+    <div class="pill disconnected" id="networkPill"><div class="dot"></div>Arc Testnet</div>
     <a class="btn btn-primary" id="connectBtn">Connect Wallet</a>
-    <button class="btn btn-outline" id="disconnectBtn" style="display:none;">Disconnect</button>
+    <a class="btn btn-outline" id="disconnectBtn" style="display:none;">Disconnect</a>
   </div>
 </header>
+<div class="network-banner" id="networkBanner" style="display:none;">
+  <span>Wrong network detected.</span>
+  <button class="btn btn-primary" id="switchNetworkBtn">Switch to Arc Testnet</button>
+</div>
 
 <section style="position:relative;">
   <div class="glow"></div>
@@ -40,7 +43,7 @@
        native stablecoin infrastructure, in one lightweight dashboard.</p>
     <div class="hero-actions">
       <a class="btn btn-primary" href="app.html">Launch App</a>
-      <a class="btn btn-outline" href="https://docs.arc.io/arc/references/connect-to-arc" target="_blank">Documentation</a>
+      <a class="btn btn-outline" href="javascript:void(0)" title="Docs coming soon">Documentation</a>
     </div>
   </div>
 </section>
@@ -92,8 +95,8 @@
   <div class="features" style="margin-top:0;">
     <div class="feature-card"><h3>✅ Wallet connect + balances</h3><p>MetaMask support with live USDC / EURC balances on Arc Testnet.</p></div>
     <div class="feature-card"><h3>✅ Send</h3><p>Direct wallet-to-wallet transfers, live today.</p></div>
-    <div class="feature-card"><h3>✅ Bridge</h3><p>Full CCTP flow via Circle's App Kit — approve, burn, attestation and mint, all in one call.</p></div>
-    <div class="feature-card"><h3>🚧 Swap</h3><p>Circle's App Kit lists browser-wallet Swap as a known limitation still in progress — this stays best-effort until that ships.</p></div>
+    <div class="feature-card"><h3>✅ Swap</h3><p>Live USDC ⇄ EURC quotes and execution via Circle's App Kit SDK.</p></div>
+    <div class="feature-card"><h3>🚧 Full bridge mint</h3><p>Automatic destination-chain minting after a CCTP burn is in progress (manual mint step for now).</p></div>
   </div>
 </section>
 

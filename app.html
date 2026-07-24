@@ -4,17 +4,17 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>ThorPay App | Swap, Bridge & Send on Arc Testnet</title>
-<link rel="icon" type="image/png" href="assets/logo.png" />
+<link rel="icon" type="image/png" href="logo.png" />
 <link rel="stylesheet" href="style.css" />
 </head>
 <body>
 
 <header>
   <div class="logo">
-    <img src="assets/logo.png" alt="ThorPay" class="mark" />
-    <div>
-      <div>ThorPay</div>
-      <div class="tagline">⚡ Thunder-Speed Stablecoin Transactions</div>
+    <img src="logo.png" alt="ThorPay" class="mark" />
+    <div class="logo-text">
+      <div class="logo-title">ThorPay</div>
+      <div class="tagline">⚡️ Thunder-Speed Stablecoin Transactions</div>
     </div>
   </div>
   <nav class="main-nav">
@@ -25,13 +25,16 @@
     <a data-tab="history">History</a>
   </nav>
   <div class="header-right">
-    <div class="pill" id="networkPill"><div class="dot" id="networkDot"></div><span id="networkLabel">Not connected</span></div>
+    <div class="pill disconnected" id="networkPill"><div class="dot"></div>Arc Testnet</div>
     <a class="btn btn-outline" href="https://faucet.circle.com/#developer-console-faucet" target="_blank">Faucet</a>
-    <button class="btn btn-primary" id="switchBtn" style="display:none;">Switch to Arc Testnet</button>
     <a class="btn btn-primary" id="connectBtn">Connect Wallet</a>
-    <button class="btn btn-outline" id="disconnectBtn" style="display:none;">Disconnect</button>
+    <a class="btn btn-outline" id="disconnectBtn" style="display:none;">Disconnect</a>
   </div>
 </header>
+<div class="network-banner" id="networkBanner" style="display:none;">
+  <span>Wrong network detected.</span>
+  <button class="btn btn-primary" id="switchNetworkBtn">Switch to Arc Testnet</button>
+</div>
 
 <main class="app">
   <div class="welcome" id="welcomeMsg">Welcome to ThorPay</div>
@@ -54,24 +57,9 @@
       </div>
       <div class="token-row">
         <div class="left"><div class="tk-icon cirbtc">B</div>
-          <div><div class="tk-name">cirBTC</div><div class="tk-sub">No public testnet address yet</div></div>
+          <div><div class="tk-name">cirBTC</div><div class="tk-sub" id="cirbtcSub">Not yet publicly available</div></div>
         </div>
-        <div class="tk-amt disabled">Coming soon</div>
-      </div>
-    </div>
-    <div class="other-chains">
-      <div class="och-title">USDC on other testnets</div>
-      <div class="token-row">
-        <div class="left"><div class="tk-icon usdc">U</div>
-          <div><div class="tk-name">USDC</div><div class="tk-sub">Ethereum Sepolia</div></div>
-        </div>
-        <div class="tk-amt" id="ethSepoliaBal">0.00</div>
-      </div>
-      <div class="token-row">
-        <div class="left"><div class="tk-icon usdc">U</div>
-          <div><div class="tk-name">USDC</div><div class="tk-sub">Base Sepolia</div></div>
-        </div>
-        <div class="tk-amt" id="baseSepoliaBal">0.00</div>
+        <div class="tk-amt disabled" id="cirbtcBal">Coming soon</div>
       </div>
     </div>
   </div>
@@ -105,22 +93,23 @@
       </div>
       <div class="balrow"><span id="swapToBal">Balance: 0.00</span></div>
     </div>
-    <div class="field" id="kitKeyField">
-      <div class="flabel">Circle Kit Key (free, one-time)</div>
-      <input type="text" id="kitKeyInput" placeholder="KIT_KEY:id:secret" />
+    <div class="field" style="margin-top:8px;">
+      <div class="flabel">Kit key (optional — from Circle Console)</div>
+      <div class="row">
+        <input type="text" id="swapKitKey" placeholder="KIT_KEY:id:secret" style="font-size:13px;font-weight:500;" />
+      </div>
     </div>
     <div class="route-box">
-      <div class="rline"><span>Route</span><span>Circle App Kit · SwapKit</span></div>
-      <div class="rline"><span>Est. output</span><span id="swapEstOut">—</span></div>
+      <div class="rline"><span>Provider</span><span>Circle App Kit (Swap)</span></div>
+      <div class="rline"><span>Status</span><span id="swapRouteStatus">Enter an amount to see a quote</span></div>
     </div>
     <button class="btn btn-primary btn-block" id="swapBtn" disabled>Connect wallet to swap</button>
     <div class="status" id="swapStatus"></div>
     <div class="hint">
-      Uses Circle's official <b>App Kit SDK</b> (<code>@circle-fin/app-kit</code>), loaded in-browser, with
-      a free Kit Key from <a href="https://console.circle.com" target="_blank">console.circle.com</a> —
-      paste your own key above; it's saved only in this browser's local storage. Circle's own App Kit FAQ
-      (July 2026) lists browser-wallet Swap as "a known limitation the team is actively working on," so this
-      may still fail with a real SDK error until that ships — Bridge and Send don't have that restriction.
+      Swap runs on Circle's <b>App Kit SDK</b> (<code>kit.swap()</code>) loaded straight from
+      <a href="https://esm.sh/@circle-fin/app-kit" target="_blank">esm.sh/@circle-fin/app-kit</a> — no bundler
+      needed. A kit key from <a href="https://console.circle.com" target="_blank">console.circle.com</a> is optional;
+      swaps still work without one, it's only needed if you want your app attributed for custom fees.
     </div>
   </div>
 
@@ -146,19 +135,22 @@
         <option value="ethSepolia">Ethereum Sepolia</option>
         <option value="baseSepolia">Base Sepolia</option>
       </select>
+      <div class="balrow"><span id="bridgeToBal">Connect your wallet to see this balance</span></div>
     </div>
     <div class="route-box">
       <div class="rline"><span>Protocol</span><span>Circle CCTP V2</span></div>
       <div class="rline"><span>Steps</span><span>Approve → Burn (Arc) → Attestation → Mint (destination)</span></div>
     </div>
     <button class="btn btn-primary btn-block" id="bridgeBtn" disabled>Connect wallet to bridge</button>
+    <button class="btn btn-primary btn-block" id="bridgeMintBtn" style="display:none;margin-top:8px;">Complete mint on destination chain</button>
     <div class="status" id="bridgeStatus"></div>
     <div class="hint" id="bridgeProgress" style="display:none;"></div>
     <div class="hint">
-      Runs on Circle's official <b>App Kit SDK</b> (<code>@circle-fin/app-kit</code>), loaded in-browser.
-      One call handles the full CCTP flow — approve, burn on Arc, wait for attestation, and mint on the
-      destination chain — so MetaMask may prompt you for a network switch partway through; that's expected,
-      not an error. No manual steps needed.
+      This burns real USDC on Arc Testnet through Circle's TokenMessengerV2, waits for Circle's Iris
+      attestation, then — once you click "Complete mint" — switches MetaMask to your destination chain
+      and calls <code>receiveMessage</code> on that chain's MessageTransmitterV2 for you. CCTP V2 testnet
+      contracts share the same address across chains, so this is verified safe on Ethereum Sepolia and
+      Base Sepolia. Your MetaMask will briefly switch networks during the mint step, then switch back.
     </div>
   </div>
 
@@ -197,7 +189,7 @@
 </main>
 
 <footer>
-  <span>ThorPay — Built on Arc</span>
+  <span>ThorPay — an independent testnet project. Not affiliated with Circle or Arc.</span>
   <span class="social-row">
     <a href="#" target="_blank" title="X (Twitter) — coming soon" class="social-icon">
       <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M18.9 2H22l-7.6 8.7L23.3 22h-6.9l-5.4-6.9L4.8 22H1.7l8.1-9.3L1 2h7l4.9 6.3L18.9 2Zm-1.2 18h1.9L7.4 3.9H5.4L17.7 20Z"/></svg>
@@ -213,5 +205,128 @@
 
 <script src="https://cdn.jsdelivr.net/npm/ethers@5.7.2/dist/ethers.umd.min.js"></script>
 <script src="script.js"></script>
+
+<!-- Swap — Circle App Kit SDK (ESM, no bundler needed). Depends on window.ThorPay
+     exposed at the bottom of script.js for wallet state + shared UI helpers. -->
+<script type="module">
+  import { AppKit } from "https://esm.sh/@circle-fin/app-kit?bundle";
+  import { createViemAdapterFromProvider } from "https://esm.sh/@circle-fin/adapter-viem-v2?bundle";
+
+  const kit = new AppKit();
+  let swapAdapter = null;
+
+  async function getAdapter() {
+    if (!window.ethereum) throw new Error("MetaMask not found.");
+    if (!swapAdapter) swapAdapter = await createViemAdapterFromProvider({ provider: window.ethereum });
+    return swapAdapter;
+  }
+
+  function swapConfig() {
+    const kitKey = document.getElementById("swapKitKey")?.value.trim();
+    return kitKey ? { kitKey } : {};
+  }
+
+  let estimateTimer = null;
+  function scheduleEstimate() {
+    clearTimeout(estimateTimer);
+    estimateTimer = setTimeout(runEstimate, 500);
+  }
+
+  async function runEstimate() {
+    const routeStatus = document.getElementById("swapRouteStatus");
+    const toAmt = document.getElementById("swapToAmt");
+    const amt = document.getElementById("swapFromAmt").value;
+    const tokenIn = document.getElementById("swapFromToken").value;
+    const tokenOut = document.getElementById("swapToToken").value;
+
+    if (!window.ThorPay || !window.ThorPay.getUserAddress()) {
+      if (routeStatus) routeStatus.innerText = "Connect your wallet to see a live quote";
+      return;
+    }
+    if (tokenIn === tokenOut) {
+      toAmt.value = "";
+      if (routeStatus) routeStatus.innerText = "Pick two different tokens";
+      return;
+    }
+    if (!amt || Number(amt) <= 0) {
+      toAmt.value = "";
+      if (routeStatus) routeStatus.innerText = "Enter an amount to see a quote";
+      return;
+    }
+
+    try {
+      if (routeStatus) routeStatus.innerText = "Fetching quote…";
+      const adapter = await getAdapter();
+      const estimate = await kit.estimateSwap({
+        from: { adapter, chain: "Arc_Testnet" },
+        tokenIn, tokenOut, amountIn: amt,
+        config: swapConfig()
+      });
+      toAmt.value = Number(estimate.estimatedOutput.amount).toFixed(4);
+      if (routeStatus) {
+        routeStatus.innerText = "≈ " + estimate.estimatedOutput.amount + " " + tokenOut +
+          " (min " + estimate.stopLimit.amount + " after slippage)";
+      }
+    } catch (err) {
+      console.error("estimateSwap failed", err);
+      toAmt.value = "";
+      if (routeStatus) routeStatus.innerText = "Couldn't fetch a quote: " + (err.message || err);
+    }
+  }
+
+  const fromAmtEl = document.getElementById("swapFromAmt");
+  if (fromAmtEl) fromAmtEl.addEventListener("input", scheduleEstimate);
+  ["swapFromToken", "swapToToken"].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.addEventListener("change", scheduleEstimate);
+  });
+
+  const swapBtn = document.getElementById("swapBtn");
+  if (swapBtn) {
+    swapBtn.addEventListener("click", async () => {
+      const statusEl = document.getElementById("swapStatus");
+      const userAddress = window.ThorPay && window.ThorPay.getUserAddress();
+      if (!userAddress) { statusEl.className = "status err"; statusEl.innerText = "Connect your wallet first."; return; }
+
+      const amt = document.getElementById("swapFromAmt").value;
+      const tokenIn = document.getElementById("swapFromToken").value;
+      const tokenOut = document.getElementById("swapToToken").value;
+      if (!amt || Number(amt) <= 0) { statusEl.className = "status err"; statusEl.innerText = "Enter an amount."; return; }
+      if (tokenIn === tokenOut) { statusEl.className = "status err"; statusEl.innerText = "Choose two different tokens."; return; }
+
+      const available = window.ThorPay.getBalance(tokenIn);
+      if (available !== null && Number(amt) > available) {
+        statusEl.className = "status err";
+        statusEl.innerText = "Insufficient balance. You have " + window.ThorPay.formatBal(available) + " " + tokenIn + " available.";
+        return;
+      }
+
+      swapBtn.disabled = true;
+      statusEl.className = "status"; statusEl.innerText = "Waiting for MetaMask confirmation…";
+
+      try {
+        const adapter = await getAdapter();
+        const result = await kit.swap({
+          from: { adapter, chain: "Arc_Testnet" },
+          tokenIn, tokenOut, amountIn: amt,
+          config: swapConfig()
+        });
+
+        statusEl.className = "status ok";
+        statusEl.innerText = "Swapped! Tx: " + result.txHash;
+        window.ThorPay.addHistory("SWAP", amt + " " + tokenIn + " → " + (result.amountOut || "?") + " " + tokenOut, result.txHash);
+        await window.ThorPay.refreshBalances();
+        document.getElementById("swapFromAmt").value = "";
+        document.getElementById("swapToAmt").value = "";
+      } catch (err) {
+        console.error("swap failed", err);
+        statusEl.className = "status err";
+        statusEl.innerText = "Swap failed: " + (err.message || err);
+      } finally {
+        swapBtn.disabled = false;
+      }
+    });
+  }
+</script>
 </body>
 </html>

@@ -2,46 +2,57 @@
    ThorPay — app logic
    Works on both index.html (landing, wallet connect only) and app.html
    (full dashboard: balances, swap, bridge, send, history).
+   Fill in / verify addresses below before relying on this for anything
+   beyond testnet experimentation.
    ========================================================================== */
 
 const CONFIG = {
   chainIdHex: "0x4CEF52",        // 5042002 decimal — Arc Testnet
-  chainIdDec: 5042002,
   chainName: "Arc Testnet",
   rpcUrls: ["https://rpc.testnet.arc.network"],
-  nativeCurrency: { name: "USDC", symbol: "USDC", decimals: 18 },
+  nativeCurrency: { name: "USDC", symbol: "USDC", decimals: 18 }, // native gas display, 18 decimals
   blockExplorerUrls: ["https://testnet.arcscan.app"],
 
-  // Verified from https://docs.arc.io/arc/references/contract-addresses
-  USDC_ERC20: "0x3600000000000000000000000000000000000000", // 6 decimals
+  // Verified from https://docs.arc.io/arc/references/contract-addresses (Arc Testnet only)
+  USDC_ERC20: "0x3600000000000000000000000000000000000000", // 6 decimals — use this for balances/transfers
   EURC_ERC20: "0x89B50855Aa3bE2F677cD6303Cec089B5F319D72a",  // 6 decimals
 
-  // Verified from Circle's own arc-defi-lend-borrow sample repo (github.com/circlefin).
-  // No public self-serve faucet yet — distributed via Circle Discord / team demo wallet.
-  CIRBTC_ERC20: "0xf0C4a4CE82A5746AbAAd9425360Ab04fbBA432BF", // 8 decimals
-  CIRBTC_HAS_FAUCET: false,
+  // cirBTC does not have a public self-serve address/faucet yet as of writing.
+  // Once Arc publishes one at https://docs.arc.io/arc/references/contract-addresses,
+  // drop it in here and the balance row will start working automatically.
+  CIRBTC_ERC20: null,
 
-  // Circle Iris attestation API (testnet) — used only as a status reference
+  // Circle CCTP V2 — testnet TokenMessengerV2 / MessageTransmitterV2 are deployed at
+  // the SAME address on every supported testnet (deterministic CREATE2 deployment),
+  // verified against Circle's own CCTP Go SDK docs.
+  CCTP_DOMAIN_ARC: 26,
+  TOKEN_MESSENGER_V2: "0x8FE6B999Dc680CcFDD5Bf7EB0974218be2542DAA",
+  MESSAGE_TRANSMITTER_V2: "0xE737e5cEBEEBa77EFE34D4aa090756590b1CE275",
+
+  // Circle StableFX escrow (legacy path — Swap now runs through Circle App Kit instead)
+  STABLEFX_ESCROW: "0x867650F5eAe8df91445971f14d89fd84F0C9a9f8",
+
+  // Circle Iris attestation API (testnet)
   IRIS_API: "https://iris-api-sandbox.circle.com",
 
-  // Destination chains for Bridge — verified USDC addresses from Circle's
-  // circlefin/skills reference (github.com/circlefin/skills)
+  // Destination testnets for Bridge. rpcUrls are public read-only endpoints, used to show
+  // your destination-chain balance without needing MetaMask to switch networks first.
   bridgeDestinations: {
     ethSepolia: {
-      name: "Ethereum Sepolia",
-      appKitChain: "Ethereum_Sepolia",
+      name: "Ethereum Sepolia", domain: 0,
       chainIdHex: "0xaa36a7",
-      usdcAddress: "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238",
-      rpc: "https://ethereum-sepolia-rpc.publicnode.com",
-      explorer: "https://sepolia.etherscan.io"
+      rpcUrls: ["https://ethereum-sepolia-rpc.publicnode.com"],
+      blockExplorerUrls: ["https://sepolia.etherscan.io"],
+      nativeCurrency: { name: "Sepolia ETH", symbol: "ETH", decimals: 18 },
+      usdc: "0x1c7D4B196Cb0C7B01d743Fbc6116a902379C7238"
     },
     baseSepolia: {
-      name: "Base Sepolia",
-      appKitChain: "Base_Sepolia",
+      name: "Base Sepolia", domain: 6,
       chainIdHex: "0x14a34",
-      usdcAddress: "0x036CbD53842c5426634e7929541eC2318f3dCF7e",
-      rpc: "https://base-sepolia-rpc.publicnode.com",
-      explorer: "https://sepolia.basescan.org"
+      rpcUrls: ["https://sepolia.base.org"],
+      blockExplorerUrls: ["https://sepolia.basescan.org"],
+      nativeCurrency: { name: "Sepolia ETH", symbol: "ETH", decimals: 18 },
+      usdc: "0x036CbD53842c5426634e7929541eC2318f3dCF7e"
     }
   }
 };
@@ -54,42 +65,36 @@ const ERC20_ABI = [
   "function allowance(address owner, address spender) view returns (uint256)"
 ];
 
+const TOKEN_MESSENGER_V2_ABI = [
+  "function depositForBurn(uint256 amount, uint32 destinationDomain, bytes32 mintRecipient, address burnToken, bytes32 destinationCaller, uint256 maxFee, uint32 minFinalityThreshold) external returns (uint64 nonce)"
+];
+
+const MESSAGE_TRANSMITTER_V2_ABI = [
+  "function receiveMessage(bytes message, bytes attestation) external returns (bool)"
+];
+
 let provider, signer, userAddress;
 let history = [];
-let currentBalances = { USDC: 0, EURC: 0, CIRBTC: 0 };
+let latestBalances = { USDC: null, EURC: null };
+let pendingMint = null;
 
 /* -------------------------------------------------------------------------
-   Small formatting / validation helpers
+   Formatting — never show a negative balance. Values under 1 keep enough
+   decimal places to still be visible instead of rounding away to "0.00".
    ------------------------------------------------------------------------- */
-function fmt(n, decimals = 2) {
-  n = Number(n);
-  if (!isFinite(n) || n < 0) n = 0;
-  return n.toFixed(decimals);
-}
-
-function sanitizeAmountInput(inputEl) {
-  let v = inputEl.value;
-  if (v === "") return;
-  let n = Number(v);
-  if (!isFinite(n) || n < 0) n = 0;
-  n = Math.round(n * 1e6) / 1e6; // avoid runaway decimal precision artifacts
-  inputEl.value = n;
-}
-
-function validateAmount(amountStr, maxBalance) {
-  const n = Number(amountStr);
-  if (!amountStr || isNaN(n) || n <= 0) return { ok: false, msg: "Enter an amount." };
-  if (n > maxBalance) return { ok: false, msg: `Insufficient balance — you have ${fmt(maxBalance, 4)} available.` };
-  return { ok: true };
-}
-
-function setText(id, txt) {
-  const el = document.getElementById(id);
-  if (el) el.innerText = txt;
+function formatBal(n) {
+  if (n === null || n === undefined || isNaN(n)) return "—";
+  if (n <= 0) return "0.00";
+  if (n < 1) {
+    let s = n.toFixed(8).replace(/0+$/, "");
+    if (s.endsWith(".")) s += "00";
+    return s;
+  }
+  return n.toFixed(2);
 }
 
 /* -------------------------------------------------------------------------
-   Tab switching (app.html only)
+   Tab switching (app.html only — no-ops harmlessly if elements don't exist)
    ------------------------------------------------------------------------- */
 document.querySelectorAll("[data-tab]").forEach(el => {
   el.addEventListener("click", () => {
@@ -103,17 +108,12 @@ document.querySelectorAll("[data-tab]").forEach(el => {
 });
 
 /* -------------------------------------------------------------------------
-   Wallet connect / disconnect / network pill
+   Wallet connect / disconnect
    ------------------------------------------------------------------------- */
 const connectBtn = document.getElementById("connectBtn");
 const disconnectBtn = document.getElementById("disconnectBtn");
-const netPill = document.getElementById("networkPill");
-const netLabel = document.getElementById("networkLabel");
-const switchBtn = document.getElementById("switchBtn");
-
 if (connectBtn) connectBtn.addEventListener("click", connectWallet);
 if (disconnectBtn) disconnectBtn.addEventListener("click", disconnectWallet);
-if (switchBtn) switchBtn.addEventListener("click", () => ensureArcNetwork());
 
 async function connectWallet() {
   if (!window.ethereum) {
@@ -121,67 +121,78 @@ async function connectWallet() {
     return;
   }
   try {
+    localStorage.removeItem("thorpay_disconnected"); // user explicitly (re)connected
+
     await window.ethereum.request({ method: "eth_requestAccounts" });
     await ensureArcNetwork();
-    await initSession();
+
+    provider = new ethers.providers.Web3Provider(window.ethereum);
+    signer = provider.getSigner();
+    userAddress = await signer.getAddress();
+
+    if (connectBtn) { connectBtn.innerText = userAddress.slice(0, 6) + "..." + userAddress.slice(-4); connectBtn.style.display = "inline-flex"; }
+    if (disconnectBtn) disconnectBtn.style.display = "inline-flex";
+
+    const welcome = document.getElementById("welcomeMsg");
+    if (welcome) { welcome.innerText = "Welcome back"; welcome.style.color = ""; }
+
+    ["swapBtn", "bridgeBtn", "sendBtn"].forEach(id => {
+      const btn = document.getElementById(id);
+      if (btn) btn.disabled = false;
+    });
+    setBtnLabel("swapBtn", "Exchange");
+    setBtnLabel("bridgeBtn", "Bridge");
+    setBtnLabel("sendBtn", "Send");
+
+    await checkNetwork();
+    loadHistory();
+    await refreshBalances();
+    await refreshDestinationBalance();
   } catch (err) {
     console.error(err);
     alert("Wallet connection failed: " + (err.message || err));
   }
 }
 
-async function initSession() {
-  provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-  signer = provider.getSigner();
-  userAddress = await signer.getAddress();
-
-  if (connectBtn) connectBtn.innerText = userAddress.slice(0, 6) + "..." + userAddress.slice(-4);
-  if (disconnectBtn) disconnectBtn.style.display = "inline-block";
-
-  const welcome = document.getElementById("welcomeMsg");
-  if (welcome) welcome.innerText = "Welcome back";
-
-  ["swapBtn", "bridgeBtn", "sendBtn"].forEach(id => setBtnEnabled(id, true));
-  setBtnLabel("swapBtn", "Exchange");
-  setBtnLabel("bridgeBtn", "Bridge");
-  setBtnLabel("sendBtn", "Send");
-
-  await updateNetworkPill();
-  await refreshBalances();
-  loadHistoryForAddress(userAddress);
-}
-
 function disconnectWallet() {
-  if (window.ethereum && window.ethereum.request) {
-    window.ethereum.request({
-      method: "wallet_revokePermissions",
-      params: [{ eth_accounts: {} }]
-    }).catch(() => { /* older MetaMask versions don't support this — ignore */ });
-  }
-
   provider = null; signer = null; userAddress = null;
-  history = [];
+  latestBalances = { USDC: null, EURC: null };
+  pendingMint = null;
+  try { localStorage.setItem("thorpay_disconnected", "1"); } catch (e) {}
 
   if (connectBtn) connectBtn.innerText = "Connect Wallet";
   if (disconnectBtn) disconnectBtn.style.display = "none";
-  const welcome = document.getElementById("welcomeMsg");
-  if (welcome) welcome.innerText = "Welcome to ThorPay";
 
-  ["swapBtn", "bridgeBtn", "sendBtn"].forEach(id => setBtnEnabled(id, false));
+  updateNetworkPill(false, false);
+  const banner = document.getElementById("networkBanner");
+  if (banner) banner.style.display = "none";
+
+  ["swapBtn", "bridgeBtn", "sendBtn"].forEach(id => {
+    const btn = document.getElementById(id);
+    if (btn) btn.disabled = true;
+  });
   setBtnLabel("swapBtn", "Connect wallet to swap");
   setBtnLabel("bridgeBtn", "Connect wallet to bridge");
   setBtnLabel("sendBtn", "Connect wallet to send");
+  const mintBtn = document.getElementById("bridgeMintBtn");
+  if (mintBtn) mintBtn.style.display = "none";
 
-  setText("usdcBal", "0.00"); setText("eurcBal", "0.00"); setText("cirbtcBal", "0.00");
-  setText("totalBalance", "$0.00");
+  setText("usdcBal", "0.00"); setText("eurcBal", "0.00"); setText("totalBalance", "$0.00");
+  setText("swapFromBal", "Balance: 0.00"); setText("bridgeFromBal", "Balance: 0.00"); setText("sendBal", "Balance: 0.00");
+  setText("bridgeToBal", "Connect your wallet to see this balance");
+
+  const welcome = document.getElementById("welcomeMsg");
+  if (welcome) { welcome.innerText = "Welcome to ThorPay"; welcome.style.color = ""; }
+
+  history = [];
   renderHistory();
-  updateNetworkPill();
+
+  // Best-effort permission revoke (EIP-2255) — not every wallet supports this, ignore failures.
+  if (window.ethereum && window.ethereum.request) {
+    window.ethereum.request({ method: "wallet_revokePermissions", params: [{ eth_accounts: {} }] }).catch(() => {});
+  }
 }
 
-function setBtnEnabled(id, enabled) {
-  const btn = document.getElementById(id);
-  if (btn) btn.disabled = !enabled;
-}
 function setBtnLabel(id, label) {
   const btn = document.getElementById(id);
   if (btn) btn.innerText = label;
@@ -211,136 +222,185 @@ async function ensureArcNetwork() {
   }
 }
 
-async function updateNetworkPill() {
-  if (!netPill) return;
-  if (!window.ethereum || !userAddress) {
-    netPill.classList.remove("connected");
-    if (netLabel) netLabel.innerText = "Not connected";
-    if (switchBtn) switchBtn.style.display = "none";
-    return;
-  }
+async function switchOrAddChain(dest) {
   try {
-    const chainId = await window.ethereum.request({ method: "eth_chainId" });
-    if (chainId.toLowerCase() === CONFIG.chainIdHex.toLowerCase()) {
-      netPill.classList.add("connected");
-      if (netLabel) netLabel.innerText = "Arc Testnet";
-      if (switchBtn) switchBtn.style.display = "none";
+    await window.ethereum.request({ method: "wallet_switchEthereumChain", params: [{ chainId: dest.chainIdHex }] });
+  } catch (switchErr) {
+    if (switchErr.code === 4902) {
+      await window.ethereum.request({
+        method: "wallet_addEthereumChain",
+        params: [{
+          chainId: dest.chainIdHex,
+          chainName: dest.name,
+          rpcUrls: dest.rpcUrls,
+          nativeCurrency: dest.nativeCurrency,
+          blockExplorerUrls: dest.blockExplorerUrls
+        }]
+      });
     } else {
-      netPill.classList.remove("connected");
-      if (netLabel) netLabel.innerText = "Wrong network";
-      if (switchBtn) switchBtn.style.display = "inline-block";
+      throw switchErr;
     }
-  } catch (e) {
-    console.warn("chainId check failed", e);
   }
 }
 
 /* -------------------------------------------------------------------------
-   Balances — always read through the ERC-20 interface, per Arc's guidance.
+   Network pill + wrong-network banner
    ------------------------------------------------------------------------- */
-async function tokenBalance(tokenAddress) {
-  const c = new ethers.Contract(tokenAddress, ERC20_ABI, provider);
+function updateNetworkPill(connected, correctChain) {
+  const pill = document.getElementById("networkPill");
+  if (pill) pill.classList.toggle("disconnected", !(connected && correctChain));
+}
+
+async function checkNetwork() {
+  const banner = document.getElementById("networkBanner");
+  if (!window.ethereum || !userAddress) {
+    updateNetworkPill(false, false);
+    if (banner) banner.style.display = "none";
+    return false;
+  }
+  try {
+    const chainId = await window.ethereum.request({ method: "eth_chainId" });
+    const correct = chainId.toLowerCase() === CONFIG.chainIdHex.toLowerCase();
+    updateNetworkPill(true, correct);
+    if (banner) banner.style.display = correct ? "none" : "flex";
+    return correct;
+  } catch (e) {
+    console.warn("network check failed", e);
+    updateNetworkPill(true, false);
+    return false;
+  }
+}
+
+const switchNetworkBtn = document.getElementById("switchNetworkBtn");
+if (switchNetworkBtn) {
+  switchNetworkBtn.addEventListener("click", async () => {
+    try {
+      await ensureArcNetwork();
+      provider = new ethers.providers.Web3Provider(window.ethereum);
+      signer = provider.getSigner();
+      await checkNetwork();
+      await refreshBalances();
+    } catch (e) {
+      console.error("switch to Arc failed", e);
+    }
+  });
+}
+
+/* -------------------------------------------------------------------------
+   Balances — always read through the ERC-20 interface (6 decimals) per
+   Arc's own guidance, rather than the native 18-decimal gas balance.
+   ------------------------------------------------------------------------- */
+async function tokenBalance(tokenAddress, customProvider) {
+  const c = new ethers.Contract(tokenAddress, ERC20_ABI, customProvider || provider);
   const [raw, decimals] = await Promise.all([c.balanceOf(userAddress), c.decimals()]);
+  return Number(ethers.utils.formatUnits(raw, decimals));
+}
+
+async function readOnlyBalance(rpcUrl, tokenAddress, address) {
+  const ro = new ethers.providers.JsonRpcProvider(rpcUrl);
+  const c = new ethers.Contract(tokenAddress, ERC20_ABI, ro);
+  const [raw, decimals] = await Promise.all([c.balanceOf(address), c.decimals()]);
   return Number(ethers.utils.formatUnits(raw, decimals));
 }
 
 async function refreshBalances() {
   if (!provider || !userAddress) return;
-  try {
-    const [usdc, eurc, cirbtc] = await Promise.all([
-      tokenBalance(CONFIG.USDC_ERC20),
-      tokenBalance(CONFIG.EURC_ERC20),
-      tokenBalance(CONFIG.CIRBTC_ERC20).catch(() => 0)
-    ]);
-    currentBalances = { USDC: usdc, EURC: eurc, CIRBTC: cirbtc };
 
-    setText("usdcBal", fmt(usdc, 2));
-    setText("eurcBal", fmt(eurc, 2));
-    setText("cirbtcBal", fmt(cirbtc, 6));
-    setText("totalBalance", "$" + fmt(usdc, 2));
-    setText("swapFromBal", "Balance: " + fmt(usdc, 4));
-    setText("bridgeFromBal", "Balance: " + fmt(usdc, 4));
-    setText("sendBal", "Balance: " + fmt(usdc, 4));
+  // Fetch USDC and EURC independently so one failing doesn't blank out the other,
+  // and surface the failure on screen instead of only logging to console.
+  const [usdcResult, eurcResult] = await Promise.allSettled([
+    tokenBalance(CONFIG.USDC_ERC20),
+    tokenBalance(CONFIG.EURC_ERC20)
+  ]);
 
-    await refreshDestinationBalance();
-  } catch (e) {
-    console.error("balance fetch failed", e);
+  const usdc = usdcResult.status === "fulfilled" ? usdcResult.value : null;
+  const eurc = eurcResult.status === "fulfilled" ? eurcResult.value : null;
+
+  if (usdcResult.status === "rejected") console.error("USDC balance fetch failed", usdcResult.reason);
+  if (eurcResult.status === "rejected") console.error("EURC balance fetch failed", eurcResult.reason);
+
+  latestBalances.USDC = usdc;
+  latestBalances.EURC = eurc;
+
+  setText("usdcBal", formatBal(usdc));
+  setText("eurcBal", formatBal(eurc));
+  setText("totalBalance", "$" + formatBal(Math.max(0, (usdc || 0) + (eurc || 0))));
+  setText("swapFromBal", "Balance: " + formatBal(usdc));
+  setText("bridgeFromBal", "Balance: " + formatBal(usdc));
+  setText("sendBal", "Balance: " + formatBal(document.getElementById("sendToken")?.value === "EURC" ? eurc : usdc));
+
+  if (usdc === null || eurc === null) {
+    const welcome = document.getElementById("welcomeMsg");
+    if (welcome) {
+      welcome.innerText = "Couldn't load balance — check you're on Arc Testnet in MetaMask and reload.";
+      welcome.style.color = "var(--red)";
+    }
+  }
+
+  // cirBTC — only wired up once Arc publishes a public contract address.
+  if (CONFIG.CIRBTC_ERC20) {
+    try {
+      const cirbtc = await tokenBalance(CONFIG.CIRBTC_ERC20);
+      setText("cirbtcBal", formatBal(cirbtc));
+      document.getElementById("cirbtcBal")?.classList.remove("disabled");
+      setText("cirbtcSub", "Arc Testnet");
+    } catch (e) {
+      console.error("cirBTC balance fetch failed", e);
+    }
   }
 }
 
-// Read-only USDC balance check on each destination testnet via public RPC —
-// no wallet switch needed — so users can see whether a bridge actually landed.
-const DEST_BAL_ELEMENT_IDS = { ethSepolia: "ethSepoliaBal", baseSepolia: "baseSepoliaBal" };
-
 async function refreshDestinationBalance() {
-  if (!userAddress) return;
-  await Promise.all(Object.entries(CONFIG.bridgeDestinations).map(async ([key, dest]) => {
-    const elId = DEST_BAL_ELEMENT_IDS[key];
-    if (!elId) return;
-    try {
-      const roProvider = new ethers.providers.JsonRpcProvider(dest.rpc);
-      const c = new ethers.Contract(dest.usdcAddress, ERC20_ABI, roProvider);
-      const [raw, decimals] = await Promise.all([c.balanceOf(userAddress), c.decimals()]);
-      const bal = Number(ethers.utils.formatUnits(raw, decimals));
-      setText(elId, fmt(bal, 4));
-    } catch (e) {
-      setText(elId, "—");
-    }
-  }));
+  const chainSel = document.getElementById("bridgeToChain");
+  const el = document.getElementById("bridgeToBal");
+  if (!chainSel || !el) return;
+  const dest = CONFIG.bridgeDestinations[chainSel.value];
+  if (!dest) return;
+  if (!userAddress) { el.innerText = "Connect your wallet to see this balance"; return; }
+  try {
+    el.innerText = "Checking " + dest.name + " balance…";
+    const bal = await readOnlyBalance(dest.rpcUrls[0], dest.usdc, userAddress);
+    el.innerText = "Balance on " + dest.name + ": " + formatBal(bal) + " USDC";
+  } catch (e) {
+    console.error("destination balance fetch failed", e);
+    el.innerText = "Couldn't load " + dest.name + " balance right now";
+  }
+}
+const bridgeToChainSel = document.getElementById("bridgeToChain");
+if (bridgeToChainSel) bridgeToChainSel.addEventListener("change", refreshDestinationBalance);
+
+function setText(id, txt) {
+  const el = document.getElementById(id);
+  if (el) el.innerText = txt;
 }
 
 /* -------------------------------------------------------------------------
-   Amount input guarding — no negatives, no exceeding balance
-   ------------------------------------------------------------------------- */
-function wireAmountField(inputId, tokenGetter, balanceMsgId, actionBtnId) {
-  const input = document.getElementById(inputId);
-  if (!input) return;
-  input.addEventListener("input", () => {
-    sanitizeAmountInput(input);
-    const token = tokenGetter ? tokenGetter() : "USDC";
-    const bal = currentBalances[token] ?? currentBalances.USDC;
-    const check = validateAmount(input.value, bal);
-    const btn = document.getElementById(actionBtnId);
-    const balEl = balanceMsgId ? document.getElementById(balanceMsgId) : null;
-    if (input.value !== "" && !check.ok && Number(input.value) > 0) {
-      if (balEl) balEl.innerText = check.msg;
-      if (balEl) balEl.classList.add("balance-warn");
-      if (btn) btn.disabled = true;
-    } else {
-      if (balEl) balEl.classList.remove("balance-warn");
-      if (balEl) balEl.innerText = "Balance: " + fmt(bal, 4);
-      if (btn && signer) btn.disabled = false;
-    }
-  });
-}
-wireAmountField("swapFromAmt", () => document.getElementById("swapFromToken").value, "swapFromBal", "swapBtn");
-wireAmountField("bridgeFromAmt", () => "USDC", "bridgeFromBal", "bridgeBtn");
-wireAmountField("sendAmt", () => document.getElementById("sendToken").value, "sendBal", "sendBtn");
-
-/* -------------------------------------------------------------------------
-   Percentage quick-fill buttons
+   Percentage quick-fill buttons — uses the balance of whatever token is
+   actually selected in that panel (was always USDC before, even on Send
+   with EURC selected).
    ------------------------------------------------------------------------- */
 document.querySelectorAll(".pct span").forEach(el => {
   el.addEventListener("click", () => {
     if (!userAddress) return;
     const panel = el.closest(".panel").id;
+    let sym = "USDC";
+    if (panel === "panel-send") sym = document.getElementById("sendToken")?.value || "USDC";
+    const full = latestBalances[sym];
+    if (full === null || full === undefined) return;
     const pct = Number(el.dataset.pct) / 100;
+    const val = (full * pct).toFixed(6);
     if (panel === "panel-swap") {
-      const token = document.getElementById("swapFromToken").value;
-      const val = (currentBalances[token] ?? 0) * pct;
-      const input = document.getElementById("swapFromAmt");
-      input.value = fmt(val, 6);
-      input.dispatchEvent(new Event("input"));
+      setValue("swapFromAmt", val);
+      document.getElementById("swapFromAmt")?.dispatchEvent(new Event("input"));
     }
-    if (panel === "panel-send") {
-      const token = document.getElementById("sendToken").value;
-      const val = (currentBalances[token] ?? 0) * pct;
-      const input = document.getElementById("sendAmt");
-      input.value = fmt(val, 6);
-      input.dispatchEvent(new Event("input"));
-    }
+    if (panel === "panel-send") setValue("sendAmt", val);
   });
 });
+
+function setValue(id, val) {
+  const el = document.getElementById(id);
+  if (el) el.value = val;
+}
 
 /* -------------------------------------------------------------------------
    Swap flip
@@ -351,102 +411,24 @@ if (swapFlip) {
     const a = document.getElementById("swapFromToken");
     const b = document.getElementById("swapToToken");
     const tmp = a.value; a.value = b.value; b.value = tmp;
+    a.dispatchEvent(new Event("change"));
   });
 }
 
 /* -------------------------------------------------------------------------
-   Swap — Circle's App Kit FAQ (community.arc.io, July 2026) says browser-
-   wallet Swap isn't supported yet ("Swap requires a server-side adapter...
-   Client-side Swap is a known limitation the team is actively working on").
-   Rather than assume that and fake a result, this makes the real call with
-   whatever Kit Key the person pastes in (their own free key from
-   console.circle.com, kept only in this browser's localStorage) and shows
-   exactly what Circle's SDK returns — including the error, if it's still
-   unsupported by the time you're reading this.
+   Swap — real execution lives in the ES module script at the bottom of
+   app.html (Circle App Kit SDK via esm.sh, needs `type="module"`). This
+   file stays a classic script for browser compatibility with the rest
+   of the app, and exposes the bits that module script needs below via
+   window.ThorPay.
    ------------------------------------------------------------------------- */
-const kitKeyInput = document.getElementById("kitKeyInput");
-if (kitKeyInput) {
-  const saved = localStorage.getItem("thorpay_kit_key");
-  if (saved) kitKeyInput.value = saved;
-  kitKeyInput.addEventListener("change", () => {
-    localStorage.setItem("thorpay_kit_key", kitKeyInput.value.trim());
-  });
-}
-
-const swapBtn = document.getElementById("swapBtn");
-if (swapBtn) {
-  swapBtn.addEventListener("click", async () => {
-    const statusEl = document.getElementById("swapStatus");
-    if (!signer) { statusEl.className = "status err"; statusEl.innerText = "Connect your wallet first."; return; }
-
-    const amt = document.getElementById("swapFromAmt").value;
-    const tokenIn = document.getElementById("swapFromToken").value;
-    const tokenOut = document.getElementById("swapToToken").value;
-    const check = validateAmount(amt, currentBalances[tokenIn] ?? 0);
-    if (!check.ok) { statusEl.className = "status err"; statusEl.innerText = check.msg; return; }
-
-    const kitKey = kitKeyInput ? kitKeyInput.value.trim() : "";
-    if (!kitKey) {
-      statusEl.className = "status err";
-      statusEl.innerText = "Paste a free Kit Key from console.circle.com first (Swap requires one; Bridge and Send don't).";
-      return;
-    }
-
-    try {
-      swapBtn.disabled = true;
-      statusEl.className = "status"; statusEl.innerText = "Loading Circle App Kit...";
-      await initAppKit();
-
-      statusEl.innerText = "Requesting a swap quote...";
-      const estimate = await appKit.estimateSwap({
-        from: { adapter: appKitAdapter, chain: "Arc_Testnet" },
-        tokenIn, tokenOut, amountIn: amt,
-        config: { kitKey }
-      });
-      setText("swapEstOut", fmt(estimate.estimatedOutput.amount, 4) + " " + tokenOut);
-      statusEl.innerText = `Quote: ~${estimate.estimatedOutput.amount} ${tokenOut}. Confirm in MetaMask...`;
-
-      const result = await appKit.swap({
-        from: { adapter: appKitAdapter, chain: "Arc_Testnet" },
-        tokenIn, tokenOut, amountIn: amt,
-        config: { kitKey }
-      });
-
-      statusEl.className = "status ok";
-      statusEl.innerText = `Swap complete. Tx: ${result.txHash}`;
-      addHistory("SWAP", amt + " " + tokenIn + " → " + tokenOut, result.txHash);
-      await refreshBalances();
-    } catch (err) {
-      console.error(err);
-      statusEl.className = "status err";
-      statusEl.innerText = "Swap failed: " + (err.message || err) +
-        " — as of Circle's July 2026 App Kit FAQ, client-side Swap from a browser wallet was still " +
-        "listed as a known limitation, so this may be exactly that.";
-    } finally {
-      swapBtn.disabled = false;
-    }
-  });
-}
 
 /* -------------------------------------------------------------------------
-   Bridge — Circle App Kit (@circle-fin/app-kit), loaded on demand from a
-   CDN so this stays a plain static site with no build step. kit.bridge()
-   runs the full CCTP flow — approve, burn, wait for attestation, and mint
-   on the destination chain — from a single call, confirmed to work with
-   browser wallets (MetaMask) in Circle's App Kit FAQ.
+   Bridge (CCTP V2) — real burn on Arc Testnet, real attestation check, and
+   a one-click mint on the destination chain (testnet TokenMessengerV2 /
+   MessageTransmitterV2 share the same address across chains, verified
+   against Circle's CCTP Go SDK docs, so this is safe to automate).
    ------------------------------------------------------------------------- */
-let appKit, appKitAdapter;
-
-async function initAppKit() {
-  if (appKit) return;
-  const [{ AppKit }, { createViemAdapterFromProvider }] = await Promise.all([
-    import("https://esm.sh/@circle-fin/app-kit@latest"),
-    import("https://esm.sh/@circle-fin/adapter-viem-v2@latest")
-  ]);
-  appKit = new AppKit();
-  appKitAdapter = await createViemAdapterFromProvider({ provider: window.ethereum });
-}
-
 const bridgeBtn = document.getElementById("bridgeBtn");
 if (bridgeBtn) {
   bridgeBtn.addEventListener("click", async () => {
@@ -455,8 +437,13 @@ if (bridgeBtn) {
     if (!signer) { statusEl.className = "status err"; statusEl.innerText = "Connect your wallet first."; return; }
 
     const amt = document.getElementById("bridgeFromAmt").value;
-    const check = validateAmount(amt, currentBalances.USDC ?? 0);
-    if (!check.ok) { statusEl.className = "status err"; statusEl.innerText = check.msg; return; }
+    if (!amt || Number(amt) <= 0) { statusEl.className = "status err"; statusEl.innerText = "Enter an amount."; return; }
+
+    if (latestBalances.USDC !== null && Number(amt) > latestBalances.USDC) {
+      statusEl.className = "status err";
+      statusEl.innerText = "Insufficient balance. You have " + formatBal(latestBalances.USDC) + " USDC available.";
+      return;
+    }
 
     const destKey = document.getElementById("bridgeToChain").value;
     const dest = CONFIG.bridgeDestinations[destKey];
@@ -464,33 +451,57 @@ if (bridgeBtn) {
     try {
       bridgeBtn.disabled = true;
       progressEl.style.display = "block";
-      statusEl.className = "status";
-      statusEl.innerText = "Loading Circle App Kit...";
-      await initAppKit();
+      document.getElementById("bridgeMintBtn").style.display = "none";
+      pendingMint = null;
 
-      progressEl.innerText = "Bridging via CCTP — approve, burn, attestation and mint all run automatically.\n" +
-        "MetaMask may prompt you to switch networks partway through — that's expected.";
-      statusEl.innerText = "Waiting for MetaMask confirmations...";
+      const usdc = new ethers.Contract(CONFIG.USDC_ERC20, ERC20_ABI, signer);
+      const decimals = await usdc.decimals();
+      const amountUnits = ethers.utils.parseUnits(amt, decimals);
 
-      const result = await appKit.bridge({
-        from: { adapter: appKitAdapter, chain: "Arc_Testnet" },
-        to: { adapter: appKitAdapter, chain: dest.appKitChain },
-        amount: amt
-      });
+      statusEl.className = "status"; statusEl.innerText = "Step 1/3 — approving USDC...";
+      progressEl.innerText = "Approving TokenMessengerV2 to spend USDC...";
+      const approveTx = await usdc.approve(CONFIG.TOKEN_MESSENGER_V2, amountUnits);
+      await approveTx.wait();
 
-      progressEl.innerText = (result.steps || [])
-        .map(s => `${s.name}: ${s.state}${s.txHash ? " (" + s.txHash.slice(0, 10) + "...)" : ""}`)
-        .join("\n");
+      statusEl.innerText = "Step 2/3 — burning USDC on Arc Testnet...";
+      progressEl.innerText = "Approved. Submitting depositForBurn...";
+      const messenger = new ethers.Contract(CONFIG.TOKEN_MESSENGER_V2, TOKEN_MESSENGER_V2_ABI, signer);
+      const mintRecipient = ethers.utils.hexZeroPad(userAddress, 32); // sending to yourself on destination by default
+      const destinationCaller = ethers.utils.hexZeroPad("0x0000000000000000000000000000000000000000", 32); // anyone can mint
+      const maxFee = 0; // standard transfer, no fast-transfer fee
+      const minFinalityThreshold = 2000; // standard finality
 
-      if (result.state === "success") {
+      const burnTx = await messenger.depositForBurn(
+        amountUnits, dest.domain, mintRecipient, CONFIG.USDC_ERC20,
+        destinationCaller, maxFee, minFinalityThreshold
+      );
+      const burnReceipt = await burnTx.wait();
+
+      statusEl.innerText = "Step 3/3 — waiting for Circle's attestation...";
+      progressEl.innerText = "Burned. Tx: " + burnReceipt.transactionHash + "\nPolling Iris API for attestation...";
+
+      const attestation = await pollAttestation(burnReceipt.transactionHash);
+
+      if (attestation && attestation.message && attestation.attestation) {
+        pendingMint = { message: attestation.message, attestation: attestation.attestation, dest };
         statusEl.className = "status ok";
-        statusEl.innerText = `Bridge complete — ${amt} USDC delivered on ${dest.name}.`;
-        const txHash = (result.steps || []).find(s => s.txHash)?.txHash || "";
-        addHistory("BRIDGE", amt + " USDC → " + dest.name, txHash);
+        statusEl.innerText = "Burn confirmed and attested! Click below to finish minting on " + dest.name + ".";
+        progressEl.innerText =
+          "Burn tx: " + burnReceipt.transactionHash + "\n" +
+          "Attestation ready. Your USDC hasn't arrived on " + dest.name + " yet — click " +
+          "\"Complete mint on destination chain\" below to finish (this will briefly switch MetaMask to " + dest.name + ").";
+        document.getElementById("bridgeMintBtn").style.display = "block";
       } else {
         statusEl.className = "status err";
-        statusEl.innerText = "Bridge finished in state: " + result.state + ". Check the step details below.";
+        statusEl.innerText = "Burned, but attestation isn't ready yet.";
+        progressEl.innerText =
+          "Burn tx: " + burnReceipt.transactionHash + "\n" +
+          "Circle's attestation can take longer on testnet — reload this page in a minute and check " +
+          "the Iris API directly if needed: " + CONFIG.IRIS_API + "/v2/messages/" + CONFIG.CCTP_DOMAIN_ARC +
+          "?transactionHash=" + burnReceipt.transactionHash;
       }
+
+      addHistory("BRIDGE", amt + " USDC → " + dest.name, burnReceipt.transactionHash);
       await refreshBalances();
     } catch (err) {
       console.error(err);
@@ -502,10 +513,81 @@ if (bridgeBtn) {
   });
 }
 
+const bridgeMintBtn = document.getElementById("bridgeMintBtn");
+if (bridgeMintBtn) {
+  bridgeMintBtn.addEventListener("click", async () => {
+    if (!pendingMint) return;
+    const statusEl = document.getElementById("bridgeStatus");
+    const progressEl = document.getElementById("bridgeProgress");
+    bridgeMintBtn.disabled = true;
+
+    try {
+      statusEl.className = "status"; statusEl.innerText = "Switching MetaMask to " + pendingMint.dest.name + "...";
+      await switchOrAddChain(pendingMint.dest);
+
+      const destProvider = new ethers.providers.Web3Provider(window.ethereum);
+      const destSigner = destProvider.getSigner();
+      const transmitter = new ethers.Contract(CONFIG.MESSAGE_TRANSMITTER_V2, MESSAGE_TRANSMITTER_V2_ABI, destSigner);
+
+      statusEl.innerText = "Minting on " + pendingMint.dest.name + "...";
+      const tx = await transmitter.receiveMessage(pendingMint.message, pendingMint.attestation);
+      const receipt = await tx.wait();
+
+      statusEl.className = "status ok";
+      statusEl.innerText = "Minted on " + pendingMint.dest.name + "! Tx: " + receipt.transactionHash;
+      progressEl.innerText = "Mint confirmed: " + receipt.transactionHash;
+      addHistory("BRIDGE-MINT", "Minted on " + pendingMint.dest.name, receipt.transactionHash);
+
+      await refreshDestinationBalance();
+
+      // Switch back to Arc so the rest of the app keeps working normally.
+      await ensureArcNetwork();
+      provider = new ethers.providers.Web3Provider(window.ethereum);
+      signer = provider.getSigner();
+      await checkNetwork();
+      await refreshBalances();
+
+      pendingMint = null;
+      bridgeMintBtn.style.display = "none";
+    } catch (err) {
+      console.error(err);
+      statusEl.className = "status err";
+      statusEl.innerText = "Mint failed: " + (err.message || err);
+    } finally {
+      bridgeMintBtn.disabled = false;
+    }
+  });
+}
+
+async function pollAttestation(txHash, attempts = 6, delayMs = 5000) {
+  for (let i = 0; i < attempts; i++) {
+    try {
+      const url = `${CONFIG.IRIS_API}/v2/messages/${CONFIG.CCTP_DOMAIN_ARC}?transactionHash=${txHash}`;
+      const res = await fetch(url);
+      if (res.ok) {
+        const data = await res.json();
+        const msg = data && data.messages && data.messages[0];
+        if (msg && msg.attestation && msg.attestation !== "PENDING") {
+          return msg;
+        }
+      }
+    } catch (e) {
+      console.warn("attestation poll failed", e);
+    }
+    await new Promise(r => setTimeout(r, delayMs));
+  }
+  return null;
+}
+
 /* -------------------------------------------------------------------------
    Send — real ERC-20 transfer (USDC or EURC) through the ERC-20 interface.
    ------------------------------------------------------------------------- */
 const sendBtn = document.getElementById("sendBtn");
+const sendTokenSel = document.getElementById("sendToken");
+if (sendTokenSel) sendTokenSel.addEventListener("change", () => {
+  setText("sendBal", "Balance: " + formatBal(latestBalances[sendTokenSel.value]));
+});
+
 if (sendBtn) {
   sendBtn.addEventListener("click", async () => {
     const statusEl = document.getElementById("sendStatus");
@@ -516,8 +598,14 @@ if (sendBtn) {
     const tokenSymbol = document.getElementById("sendToken").value;
 
     if (!ethers.utils.isAddress(to)) { statusEl.className = "status err"; statusEl.innerText = "Enter a valid address."; return; }
-    const check = validateAmount(amt, currentBalances[tokenSymbol] ?? 0);
-    if (!check.ok) { statusEl.className = "status err"; statusEl.innerText = check.msg; return; }
+    if (!amt || Number(amt) <= 0) { statusEl.className = "status err"; statusEl.innerText = "Enter an amount."; return; }
+
+    const available = latestBalances[tokenSymbol];
+    if (available !== null && Number(amt) > available) {
+      statusEl.className = "status err";
+      statusEl.innerText = "Insufficient balance. You have " + formatBal(available) + " " + tokenSymbol + " available.";
+      return;
+    }
 
     const tokenAddress = tokenSymbol === "USDC" ? CONFIG.USDC_ERC20 : CONFIG.EURC_ERC20;
 
@@ -539,15 +627,15 @@ if (sendBtn) {
 }
 
 /* -------------------------------------------------------------------------
-   History — persisted in localStorage per address, so it survives
-   disconnect/reconnect (this is a plain static site, not a sandboxed
-   artifact preview, so localStorage is safe to use here).
+   History — persisted per-wallet-address in localStorage, so it survives
+   disconnect → reconnect (and page reloads), not just the current session.
    ------------------------------------------------------------------------- */
 function historyKey(addr) { return "thorpay_history_" + addr.toLowerCase(); }
 
-function loadHistoryForAddress(addr) {
+function loadHistory() {
+  if (!userAddress) { history = []; renderHistory(); return; }
   try {
-    const raw = localStorage.getItem(historyKey(addr));
+    const raw = localStorage.getItem(historyKey(userAddress));
     history = raw ? JSON.parse(raw) : [];
   } catch (e) {
     history = [];
@@ -555,22 +643,24 @@ function loadHistoryForAddress(addr) {
   renderHistory();
 }
 
-function saveHistory() {
-  if (!userAddress) return;
-  try { localStorage.setItem(historyKey(userAddress), JSON.stringify(history)); } catch (e) { /* ignore quota errors */ }
-}
-
 function addHistory(type, desc, txHash) {
   history.unshift({ type, desc, txHash, time: new Date().toLocaleString() });
-  saveHistory();
+  history = history.slice(0, 50);
+  if (userAddress) {
+    try { localStorage.setItem(historyKey(userAddress), JSON.stringify(history)); } catch (e) { console.warn("history save failed", e); }
+  }
   renderHistory();
 }
 
 function renderHistory() {
   const el = document.getElementById("historyList");
   if (!el) return;
+  if (!userAddress) {
+    el.innerHTML = '<div class="status">Connect your wallet to see your history.</div>';
+    return;
+  }
   if (history.length === 0) {
-    el.innerHTML = '<div class="status">No transactions yet.</div>';
+    el.innerHTML = '<div class="status">No transactions yet for this wallet.</div>';
     return;
   }
   el.innerHTML = history.map(h => `
@@ -578,44 +668,71 @@ function renderHistory() {
       <div class="htype ${h.type}">${h.type}</div>
       <div class="hamt">${h.desc}</div>
       <div style="color:var(--muted);font-size:11px;margin-top:4px;">${h.time}</div>
-      ${h.txHash ? `<a href="${CONFIG.blockExplorerUrls[0]}/tx/${h.txHash}" target="_blank">View on explorer</a>` : ""}
+      <a href="${CONFIG.blockExplorerUrls[0]}/tx/${h.txHash}" target="_blank">View on explorer</a>
     </div>
   `).join("");
 }
 
 /* -------------------------------------------------------------------------
-   React to account/network changes without a hard page reload
+   React to account/network changes — updates state in place instead of
+   reloading the page, so an in-flight balance fetch never gets cut off.
    ------------------------------------------------------------------------- */
 if (window.ethereum) {
   window.ethereum.on("accountsChanged", async (accounts) => {
     if (!accounts || accounts.length === 0) {
       disconnectWallet();
-    } else if (userAddress) {
-      await initSession();
+      return;
     }
+    provider = new ethers.providers.Web3Provider(window.ethereum);
+    signer = provider.getSigner();
+    userAddress = accounts[0];
+    if (connectBtn) connectBtn.innerText = userAddress.slice(0, 6) + "..." + userAddress.slice(-4);
+    loadHistory();
+    await checkNetwork();
+    await refreshBalances();
+    await refreshDestinationBalance();
   });
+
   window.ethereum.on("chainChanged", async () => {
-    await updateNetworkPill();
-    if (userAddress) {
-      provider = new ethers.providers.Web3Provider(window.ethereum, "any");
-      signer = provider.getSigner();
-      await refreshBalances();
-    }
+    if (!userAddress) return; // not connected yet — nothing to update
+    provider = new ethers.providers.Web3Provider(window.ethereum);
+    signer = provider.getSigner();
+    const correct = await checkNetwork();
+    if (correct) await refreshBalances();
   });
 }
 
-// Silently restore a previously-approved connection on page load, without
-// prompting MetaMask again.
-(async function restoreSession() {
-  if (!window.ethereum) { updateNetworkPill(); return; }
+/* -------------------------------------------------------------------------
+   Auto-reconnect on load — if MetaMask is already authorized for this site
+   and the user hasn't explicitly disconnected, silently restore the
+   connection and load balances without a second click. eth_accounts
+   (unlike eth_requestAccounts) never prompts, so this is safe to call on
+   every page load.
+   ------------------------------------------------------------------------- */
+(async function autoReconnect() {
+  if (!window.ethereum || !connectBtn) return;
+  if (localStorage.getItem("thorpay_disconnected") === "1") return;
   try {
     const accounts = await window.ethereum.request({ method: "eth_accounts" });
     if (accounts && accounts.length > 0) {
-      await initSession();
-    } else {
-      updateNetworkPill();
+      await connectWallet();
     }
   } catch (e) {
-    updateNetworkPill();
+    console.warn("auto-reconnect skipped", e);
   }
 })();
+
+/* -------------------------------------------------------------------------
+   Expose wallet state + shared helpers for the App Kit swap module script
+   in app.html (that script is type="module" and can't reliably see this
+   classic script's top-level let/const bindings, so it reads window.ThorPay
+   instead).
+   ------------------------------------------------------------------------- */
+window.ThorPay = {
+  getUserAddress: () => userAddress,
+  getSigner: () => signer,
+  getBalance: (symbol) => latestBalances[symbol] ?? null,
+  formatBal,
+  refreshBalances,
+  addHistory
+};
